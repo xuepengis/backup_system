@@ -10,15 +10,6 @@
 #include "utils/metadata_utils.hpp"
 #include "utils/path_utils.hpp"
 
-namespace backup_system::strategy {
-
-bool PassThroughFileFilter::should_include(const std::filesystem::directory_entry& entry) const {
-    (void)entry;
-    return true;
-}
-
-}  // namespace backup_system::strategy
-
 namespace backup_system::core {
 
 namespace {
@@ -85,7 +76,7 @@ void BackupEngine::backup(const BackupOptions& options) const {
     for (std::filesystem::recursive_directory_iterator it(options.source_root), end; it != end; ++it) {
         const auto& entry = *it;
 
-        if (!filter_->should_include(entry)) {
+        if (!filter_->should_include(entry, options.source_root)) {
             if (entry.is_directory()) {
                 it.disable_recursion_pending();
             }

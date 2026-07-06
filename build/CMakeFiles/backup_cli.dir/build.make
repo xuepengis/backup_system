@@ -83,10 +83,24 @@ CMakeFiles/backup_cli.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/main.cpp -o CMakeFiles/backup_cli.dir/main.cpp.s
 
+CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o: CMakeFiles/backup_cli.dir/flags.make
+CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o: ../src/app/cli_parser.cpp
+CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o -MF CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o.d -o CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o -c /data/users/pennxue/backup_system/src/app/cli_parser.cpp
+
+CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /data/users/pennxue/backup_system/src/app/cli_parser.cpp > CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.i
+
+CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/src/app/cli_parser.cpp -o CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.s
+
 CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o: ../src/core/backup_engine.cpp
 CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o -MF CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o.d -o CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o -c /data/users/pennxue/backup_system/src/core/backup_engine.cpp
 
 CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.s: cmake_force
 CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: ../src/strategy/archive_strategy.cpp
 CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o -c /data/users/pennxue/backup_system/src/strategy/archive_strategy.cpp
 
 CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.s: cmake_force
 CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o: ../src/strategy/codec_registry.cpp
 CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o -c /data/users/pennxue/backup_system/src/strategy/codec_registry.cpp
 
 CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.i: cmake_force
@@ -125,10 +139,52 @@ CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/src/strategy/codec_registry.cpp -o CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.s
 
+CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o: CMakeFiles/backup_cli.dir/flags.make
+CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o: ../src/strategy/file_filter.cpp
+CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o -c /data/users/pennxue/backup_system/src/strategy/file_filter.cpp
+
+CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /data/users/pennxue/backup_system/src/strategy/file_filter.cpp > CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.i
+
+CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/src/strategy/file_filter.cpp -o CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.s
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o: CMakeFiles/backup_cli.dir/flags.make
+CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o: ../src/strategy/filter_registry.cpp
+CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o -c /data/users/pennxue/backup_system/src/strategy/filter_registry.cpp
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /data/users/pennxue/backup_system/src/strategy/filter_registry.cpp > CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.i
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/src/strategy/filter_registry.cpp -o CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.s
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o: CMakeFiles/backup_cli.dir/flags.make
+CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o: ../src/strategy/filter_spec_builder.cpp
+CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o -c /data/users/pennxue/backup_system/src/strategy/filter_spec_builder.cpp
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /data/users/pennxue/backup_system/src/strategy/filter_spec_builder.cpp > CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.i
+
+CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /data/users/pennxue/backup_system/src/strategy/filter_spec_builder.cpp -o CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.s
+
 CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o: ../src/strategy/stream_processor.cpp
 CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o -MF CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o.d -o CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o -c /data/users/pennxue/backup_system/src/strategy/stream_processor.cpp
 
 CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.i: cmake_force
@@ -142,7 +198,7 @@ CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.s: cmake_force
 CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o: ../src/utils/logger.cpp
 CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o -MF CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o.d -o CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o -c /data/users/pennxue/backup_system/src/utils/logger.cpp
 
 CMakeFiles/backup_cli.dir/src/utils/logger.cpp.i: cmake_force
@@ -156,7 +212,7 @@ CMakeFiles/backup_cli.dir/src/utils/logger.cpp.s: cmake_force
 CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o: ../src/utils/metadata_utils.cpp
 CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o -MF CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o.d -o CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o -c /data/users/pennxue/backup_system/src/utils/metadata_utils.cpp
 
 CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.i: cmake_force
@@ -170,7 +226,7 @@ CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.s: cmake_force
 CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o: CMakeFiles/backup_cli.dir/flags.make
 CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o: ../src/utils/path_utils.cpp
 CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o: CMakeFiles/backup_cli.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o -MF CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o.d -o CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o -c /data/users/pennxue/backup_system/src/utils/path_utils.cpp
 
 CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.i: cmake_force
@@ -184,9 +240,13 @@ CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.s: cmake_force
 # Object files for target backup_cli
 backup_cli_OBJECTS = \
 "CMakeFiles/backup_cli.dir/main.cpp.o" \
+"CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o" \
+"CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o" \
+"CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o" \
+"CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o" \
 "CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o" \
@@ -196,16 +256,20 @@ backup_cli_OBJECTS = \
 backup_cli_EXTERNAL_OBJECTS =
 
 backup_cli: CMakeFiles/backup_cli.dir/main.cpp.o
+backup_cli: CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o
+backup_cli: CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o
+backup_cli: CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o
+backup_cli: CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o
 backup_cli: CMakeFiles/backup_cli.dir/build.make
 backup_cli: CMakeFiles/backup_cli.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable backup_cli"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable backup_cli"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/backup_cli.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

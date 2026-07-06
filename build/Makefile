@@ -153,6 +153,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/app/cli_parser.o: src/app/cli_parser.cpp.o
+.PHONY : src/app/cli_parser.o
+
+# target to build an object file
+src/app/cli_parser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o
+.PHONY : src/app/cli_parser.cpp.o
+
+src/app/cli_parser.i: src/app/cli_parser.cpp.i
+.PHONY : src/app/cli_parser.i
+
+# target to preprocess a source file
+src/app/cli_parser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.i
+.PHONY : src/app/cli_parser.cpp.i
+
+src/app/cli_parser.s: src/app/cli_parser.cpp.s
+.PHONY : src/app/cli_parser.s
+
+# target to generate assembly for a file
+src/app/cli_parser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.s
+.PHONY : src/app/cli_parser.cpp.s
+
 src/core/backup_engine.o: src/core/backup_engine.cpp.o
 .PHONY : src/core/backup_engine.o
 
@@ -224,6 +248,78 @@ src/strategy/codec_registry.s: src/strategy/codec_registry.cpp.s
 src/strategy/codec_registry.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.s
 .PHONY : src/strategy/codec_registry.cpp.s
+
+src/strategy/file_filter.o: src/strategy/file_filter.cpp.o
+.PHONY : src/strategy/file_filter.o
+
+# target to build an object file
+src/strategy/file_filter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o
+.PHONY : src/strategy/file_filter.cpp.o
+
+src/strategy/file_filter.i: src/strategy/file_filter.cpp.i
+.PHONY : src/strategy/file_filter.i
+
+# target to preprocess a source file
+src/strategy/file_filter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.i
+.PHONY : src/strategy/file_filter.cpp.i
+
+src/strategy/file_filter.s: src/strategy/file_filter.cpp.s
+.PHONY : src/strategy/file_filter.s
+
+# target to generate assembly for a file
+src/strategy/file_filter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.s
+.PHONY : src/strategy/file_filter.cpp.s
+
+src/strategy/filter_registry.o: src/strategy/filter_registry.cpp.o
+.PHONY : src/strategy/filter_registry.o
+
+# target to build an object file
+src/strategy/filter_registry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.o
+.PHONY : src/strategy/filter_registry.cpp.o
+
+src/strategy/filter_registry.i: src/strategy/filter_registry.cpp.i
+.PHONY : src/strategy/filter_registry.i
+
+# target to preprocess a source file
+src/strategy/filter_registry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.i
+.PHONY : src/strategy/filter_registry.cpp.i
+
+src/strategy/filter_registry.s: src/strategy/filter_registry.cpp.s
+.PHONY : src/strategy/filter_registry.s
+
+# target to generate assembly for a file
+src/strategy/filter_registry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_registry.cpp.s
+.PHONY : src/strategy/filter_registry.cpp.s
+
+src/strategy/filter_spec_builder.o: src/strategy/filter_spec_builder.cpp.o
+.PHONY : src/strategy/filter_spec_builder.o
+
+# target to build an object file
+src/strategy/filter_spec_builder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.o
+.PHONY : src/strategy/filter_spec_builder.cpp.o
+
+src/strategy/filter_spec_builder.i: src/strategy/filter_spec_builder.cpp.i
+.PHONY : src/strategy/filter_spec_builder.i
+
+# target to preprocess a source file
+src/strategy/filter_spec_builder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.i
+.PHONY : src/strategy/filter_spec_builder.cpp.i
+
+src/strategy/filter_spec_builder.s: src/strategy/filter_spec_builder.cpp.s
+.PHONY : src/strategy/filter_spec_builder.s
+
+# target to generate assembly for a file
+src/strategy/filter_spec_builder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.s
+.PHONY : src/strategy/filter_spec_builder.cpp.s
 
 src/strategy/stream_processor.o: src/strategy/stream_processor.cpp.o
 .PHONY : src/strategy/stream_processor.o
@@ -333,6 +429,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/app/cli_parser.o"
+	@echo "... src/app/cli_parser.i"
+	@echo "... src/app/cli_parser.s"
 	@echo "... src/core/backup_engine.o"
 	@echo "... src/core/backup_engine.i"
 	@echo "... src/core/backup_engine.s"
@@ -342,6 +441,15 @@ help:
 	@echo "... src/strategy/codec_registry.o"
 	@echo "... src/strategy/codec_registry.i"
 	@echo "... src/strategy/codec_registry.s"
+	@echo "... src/strategy/file_filter.o"
+	@echo "... src/strategy/file_filter.i"
+	@echo "... src/strategy/file_filter.s"
+	@echo "... src/strategy/filter_registry.o"
+	@echo "... src/strategy/filter_registry.i"
+	@echo "... src/strategy/filter_registry.s"
+	@echo "... src/strategy/filter_spec_builder.o"
+	@echo "... src/strategy/filter_spec_builder.i"
+	@echo "... src/strategy/filter_spec_builder.s"
 	@echo "... src/strategy/stream_processor.o"
 	@echo "... src/strategy/stream_processor.i"
 	@echo "... src/strategy/stream_processor.s"
