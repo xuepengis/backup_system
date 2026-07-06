@@ -1,0 +1,3 @@
+/data/users/pennxue/backup_system/build/CMakeFiles/backup_cli.dir
+/data/users/pennxue/backup_system/build/CMakeFiles/edit_cache.dir
+/data/users/pennxue/backup_system/build/CMakeFiles/rebuild_cache.dir
