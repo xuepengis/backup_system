@@ -2,8 +2,12 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <istream>
 #include <memory>
+#include <ostream>
 #include <string>
+
+#include "utils/metadata_utils.hpp"
 
 namespace backup_system::strategy {
 
@@ -19,15 +23,18 @@ struct ArchiveEntry {
     std::uint64_t stored_size {0};
     std::uint64_t original_size {0};
     std::uint64_t checksum {0};
+    utils::FileMetadata metadata {};
 };
 
 class IArchiveWriter {
 public:
     virtual ~IArchiveWriter() = default;
 
-    virtual void write_directory(const std::filesystem::path& relative_path) = 0;
+    virtual void write_directory(const std::filesystem::path& relative_path,
+                                 const utils::FileMetadata& metadata) = 0;
     virtual std::ostream& begin_file(const std::filesystem::path& relative_path,
-                                     std::uint64_t original_size) = 0;
+                                     std::uint64_t original_size,
+                                     const utils::FileMetadata& metadata) = 0;
     virtual void end_file() = 0;
     virtual void finish() = 0;
 };

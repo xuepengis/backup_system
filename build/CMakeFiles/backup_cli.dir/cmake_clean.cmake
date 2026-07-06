@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o.d"
   "CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o"
   "CMakeFiles/backup_cli.dir/src/utils/logger.cpp.o.d"
+  "CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o"
+  "CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o.d"
   "CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o"
   "CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o.d"
   "backup_cli"

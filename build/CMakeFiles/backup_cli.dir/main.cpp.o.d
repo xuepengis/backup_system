@@ -215,6 +215,10 @@ CMakeFiles/backup_cli.dir/main.cpp.o: \
  /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/sstream \
  /usr/include/c++/11/bits/sstream.tcc /usr/include/c++/11/codecvt \
  /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
+ /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc \
  /data/users/pennxue/backup_system/include/strategy/iarchive_strategy.hpp \
+ /data/users/pennxue/backup_system/include/utils/metadata_utils.hpp \
  /data/users/pennxue/backup_system/include/strategy/ifile_filter.hpp \
  /data/users/pennxue/backup_system/include/strategy/istream_processor.hpp

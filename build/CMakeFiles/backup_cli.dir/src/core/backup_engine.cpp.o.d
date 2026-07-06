@@ -214,8 +214,12 @@ CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o: \
  /usr/include/c++/11/bits/stream_iterator.h \
  /usr/include/c++/11/bits/uses_allocator_args.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
- /usr/include/c++/11/pstl/execution_defs.h \
+ /usr/include/c++/11/pstl/execution_defs.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc \
  /data/users/pennxue/backup_system/include/strategy/iarchive_strategy.hpp \
+ /data/users/pennxue/backup_system/include/utils/metadata_utils.hpp \
  /data/users/pennxue/backup_system/include/strategy/ifile_filter.hpp \
  /data/users/pennxue/backup_system/include/strategy/istream_processor.hpp \
  /usr/include/c++/11/fstream \

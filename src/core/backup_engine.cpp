@@ -4,8 +4,10 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "utils/logger.hpp"
+#include "utils/metadata_utils.hpp"
 #include "utils/path_utils.hpp"
 
 namespace backup_system::strategy {
@@ -89,6 +91,7 @@ void BackupEngine::backup(const BackupOptions& options) const {
     }
     auto archive_writer = archive_strategy_->create_writer(options.archive_path);
     utils::Logger::info("starting backup from " + describe_path(options.source_root));
+    archive_writer->write_directory(".", utils::MetadataUtils::collect(options.source_root));
 
     for (std::filesystem::recursive_directory_iterator it(options.source_root), end; it != end; ++it) {
         const auto& entry = *it;
@@ -113,6 +116,7 @@ void BackupEngine::restore(const RestoreOptions& options) const {
     auto archive_reader = archive_strategy_->create_reader(options.archive_path);
     std::filesystem::create_directories(options.restore_root);
     utils::Logger::info("starting restore into " + describe_path(options.restore_root));
+    std::vector<DeferredMetadataEntry> deferred_directory_metadata;
 
     while (true) {
         const auto entry = archive_reader->read_next_entry();
@@ -120,7 +124,7 @@ void BackupEngine::restore(const RestoreOptions& options) const {
             break;
         }
         if (entry.type == strategy::ArchiveEntryType::directory) {
-            restore_directory(entry, options.restore_root);
+            restore_directory(entry, options.restore_root, deferred_directory_metadata);
             continue;
         }
         if (entry.type == strategy::ArchiveEntryType::regular_file) {
@@ -132,6 +136,7 @@ void BackupEngine::restore(const RestoreOptions& options) const {
     }
 
     archive_reader->finish();
+    apply_deferred_directory_metadata(deferred_directory_metadata);
     utils::Logger::info("restore completed from " + describe_path(options.archive_path));
 }
 
@@ -166,7 +171,7 @@ void BackupEngine::backup_directory_entry(const std::filesystem::path& source_ro
         utils::PathUtils::normalize_for_storage(std::filesystem::relative(entry.path(), source_root));
 
     if (entry.is_directory()) {
-        archive_writer.write_directory(relative_path);
+        archive_writer.write_directory(relative_path, utils::MetadataUtils::collect(entry.path()));
         return;
     }
 
@@ -184,17 +189,22 @@ void BackupEngine::backup_regular_file(const std::filesystem::path& source_path,
     }
 
     const auto original_size = static_cast<std::uint64_t>(std::filesystem::file_size(source_path));
-    auto& archive_output = archive_writer.begin_file(relative_path, original_size);
+    auto& archive_output = archive_writer.begin_file(
+        relative_path,
+        original_size,
+        utils::MetadataUtils::collect(source_path));
     stream_processor_->backup(input, archive_output, source_path);
     archive_writer.end_file();
 }
 
 void BackupEngine::restore_directory(const strategy::ArchiveEntry& entry,
-                                     const std::filesystem::path& restore_root) const {
+                                     const std::filesystem::path& restore_root,
+                                     std::vector<DeferredMetadataEntry>& deferred_metadata) const {
     const auto target_path = entry.relative_path == "."
                                  ? restore_root
                                  : restore_root / entry.relative_path;
     std::filesystem::create_directories(target_path);
+    deferred_metadata.push_back({target_path, entry.metadata});
 }
 
 void BackupEngine::restore_regular_file(const strategy::ArchiveEntry& entry,
@@ -220,6 +230,14 @@ void BackupEngine::restore_regular_file(const strategy::ArchiveEntry& entry,
     const auto restored_size = static_cast<std::uint64_t>(std::filesystem::file_size(target_path));
     if (restored_size != entry.original_size) {
         throw std::runtime_error("restored file size does not match archive metadata for: " + target_path.string());
+    }
+    utils::MetadataUtils::apply(target_path, entry.metadata);
+}
+
+void BackupEngine::apply_deferred_directory_metadata(
+    const std::vector<DeferredMetadataEntry>& deferred_metadata) const {
+    for (auto it = deferred_metadata.rbegin(); it != deferred_metadata.rend(); ++it) {
+        utils::MetadataUtils::apply(it->target_path, it->metadata);
     }
 }
 

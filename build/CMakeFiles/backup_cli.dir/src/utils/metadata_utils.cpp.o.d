@@ -1,7 +1,7 @@
-CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
- /data/users/pennxue/backup_system/src/strategy/archive_strategy.cpp \
+CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o: \
+ /data/users/pennxue/backup_system/src/utils/metadata_utils.cpp \
  /usr/include/stdc-predef.h \
- /data/users/pennxue/backup_system/include/strategy/iarchive_strategy.hpp \
+ /data/users/pennxue/backup_system/include/utils/metadata_utils.hpp \
  /usr/include/c++/11/cstdint \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -181,48 +181,13 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
  /usr/include/c++/11/bits/refwrap.h \
  /usr/include/c++/11/ext/aligned_buffer.h \
  /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
- /usr/include/c++/11/memory /usr/include/c++/11/bits/stl_uninitialized.h \
- /usr/include/c++/11/bits/stl_raw_storage_iter.h \
- /usr/include/c++/11/bits/align.h /usr/include/c++/11/bit \
- /usr/include/c++/11/bits/shared_ptr_atomic.h \
- /usr/include/c++/11/bits/atomic_base.h \
- /usr/include/c++/11/bits/atomic_lockfree_defines.h \
- /usr/include/c++/11/bits/atomic_wait.h /usr/include/c++/11/climits \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
- /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
- /usr/include/x86_64-linux-gnu/bits/local_lim.h \
- /usr/include/linux/limits.h \
- /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
- /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
- /usr/include/x86_64-linux-gnu/bits/uio_lim.h /usr/include/unistd.h \
- /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
- /usr/include/x86_64-linux-gnu/bits/environments.h \
- /usr/include/x86_64-linux-gnu/bits/confname.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
- /usr/include/linux/close_range.h /usr/include/syscall.h \
- /usr/include/x86_64-linux-gnu/sys/syscall.h \
- /usr/include/x86_64-linux-gnu/asm/unistd.h \
- /usr/include/x86_64-linux-gnu/asm/unistd_64.h \
- /usr/include/x86_64-linux-gnu/bits/syscall.h \
- /usr/include/c++/11/bits/std_mutex.h \
- /usr/include/c++/11/backward/auto_ptr.h \
- /usr/include/c++/11/bits/ranges_uninitialized.h \
- /usr/include/c++/11/bits/ranges_algobase.h /usr/include/c++/11/iterator \
- /usr/include/c++/11/bits/stream_iterator.h \
- /usr/include/c++/11/bits/uses_allocator_args.h \
- /usr/include/c++/11/pstl/glue_memory_defs.h \
- /usr/include/c++/11/pstl/execution_defs.h \
- /data/users/pennxue/backup_system/include/utils/metadata_utils.hpp \
- /usr/include/c++/11/cstddef /usr/include/c++/11/fstream \
- /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
- /usr/include/c++/11/bits/fstream.tcc \
- /usr/include/x86_64-linux-gnu/sys/stat.h \
- /usr/include/x86_64-linux-gnu/bits/stat.h \
+ /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
+ /usr/include/fcntl.h /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/linux/falloc.h /usr/include/x86_64-linux-gnu/bits/stat.h \
  /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
+ /usr/include/x86_64-linux-gnu/sys/stat.h \
  /usr/include/x86_64-linux-gnu/bits/statx.h /usr/include/linux/stat.h \
  /usr/include/linux/types.h /usr/include/x86_64-linux-gnu/asm/types.h \
  /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h \
@@ -235,4 +200,10 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
- /data/users/pennxue/backup_system/include/utils/path_utils.hpp
+ /usr/include/unistd.h /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+ /usr/include/linux/close_range.h

@@ -8,6 +8,9 @@
 #include <stdexcept>
 #include <string>
 
+#include <sys/stat.h>
+
+#include "utils/metadata_utils.hpp"
 #include "utils/path_utils.hpp"
 
 namespace backup_system::strategy {
@@ -15,7 +18,7 @@ namespace backup_system::strategy {
 namespace {
 
 constexpr std::array<char, 4> kArchiveMagic {'B', 'K', 'S', '1'};
-constexpr std::uint16_t kArchiveVersion = 1;
+constexpr std::uint16_t kArchiveVersion = 2;
 constexpr std::uint16_t kArchiveFlags = 0;
 constexpr std::uint64_t kFnvOffsetBasis = 14695981039346656037ULL;
 constexpr std::uint64_t kFnvPrime = 1099511628211ULL;
@@ -278,6 +281,13 @@ void write_archive_entry_header(std::ostream& archive, const ArchiveEntry& entry
     write_binary(archive, entry.stored_size);
     write_binary(archive, entry.original_size);
     write_binary(archive, entry.checksum);
+    write_binary(archive, entry.metadata.mode);
+    write_binary(archive, entry.metadata.access_time_sec);
+    write_binary(archive, entry.metadata.access_time_nsec);
+    write_binary(archive, entry.metadata.modification_time_sec);
+    write_binary(archive, entry.metadata.modification_time_nsec);
+    write_binary(archive, entry.metadata.owner_uid);
+    write_binary(archive, entry.metadata.owner_gid);
 }
 
 ArchiveEntry read_archive_entry_header(std::istream& archive) {
@@ -301,6 +311,13 @@ ArchiveEntry read_archive_entry_header(std::istream& archive) {
     entry.stored_size = read_binary<std::uint64_t>(archive);
     entry.original_size = read_binary<std::uint64_t>(archive);
     entry.checksum = read_binary<std::uint64_t>(archive);
+    entry.metadata.mode = read_binary<std::uint32_t>(archive);
+    entry.metadata.access_time_sec = read_binary<std::int64_t>(archive);
+    entry.metadata.access_time_nsec = read_binary<std::int64_t>(archive);
+    entry.metadata.modification_time_sec = read_binary<std::int64_t>(archive);
+    entry.metadata.modification_time_nsec = read_binary<std::int64_t>(archive);
+    entry.metadata.owner_uid = read_binary<std::uint32_t>(archive);
+    entry.metadata.owner_gid = read_binary<std::uint32_t>(archive);
     return entry;
 }
 
@@ -316,6 +333,9 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         if (checksum_path(utils::PathUtils::to_generic_string(entry.relative_path)) != entry.checksum) {
             throw std::runtime_error("directory entry checksum mismatch");
         }
+        if ((entry.metadata.mode & S_IFMT) != S_IFDIR) {
+            throw std::runtime_error("directory entry metadata mode mismatch");
+        }
         if (is_first_entry && entry.relative_path != ".") {
             throw std::runtime_error("first archive entry must be the root directory marker");
         }
@@ -327,6 +347,9 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         if (entry.checksum == 0 && entry.stored_size != 0) {
             throw std::runtime_error("regular file entry with payload must contain a checksum");
         }
+        if ((entry.metadata.mode & S_IFMT) != S_IFREG) {
+            throw std::runtime_error("regular file entry metadata mode mismatch");
+        }
         return;
     case ArchiveEntryType::end_of_archive:
         if (!entry.relative_path.empty()) {
@@ -334,6 +357,15 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         }
         if (entry.stored_size != 0 || entry.original_size != 0 || entry.checksum != 0) {
             throw std::runtime_error("end-of-archive entry must have zeroed metadata");
+        }
+        if (entry.metadata.mode != 0 ||
+            entry.metadata.access_time_sec != 0 ||
+            entry.metadata.access_time_nsec != 0 ||
+            entry.metadata.modification_time_sec != 0 ||
+            entry.metadata.modification_time_nsec != 0 ||
+            entry.metadata.owner_uid != 0 ||
+            entry.metadata.owner_gid != 0) {
+            throw std::runtime_error("end-of-archive entry must have zeroed metadata fields");
         }
         if (is_first_entry) {
             throw std::runtime_error("archive cannot start with end-of-archive entry");
@@ -352,25 +384,30 @@ public:
             throw std::runtime_error("failed to open archive for writing");
         }
         write_archive_header(archive_);
-        write_archive_entry_header(archive_, ArchiveEntry {ArchiveEntryType::directory, ".", 0, 0, checksum_path(".")});
-        root_written_ = true;
     }
 
-    void write_directory(const std::filesystem::path& relative_path) override {
+    void write_directory(const std::filesystem::path& relative_path,
+                         const utils::FileMetadata& metadata) override {
         const auto normalized_path = utils::PathUtils::normalize_for_storage(relative_path);
         const auto path_text = utils::PathUtils::to_generic_string(normalized_path);
         write_archive_entry_header(
             archive_,
-            ArchiveEntry {ArchiveEntryType::directory, normalized_path, 0, 0, checksum_path(path_text)});
+            ArchiveEntry {ArchiveEntryType::directory, normalized_path, 0, 0, checksum_path(path_text), metadata});
+        if (normalized_path == ".") {
+            root_written_ = true;
+        }
     }
 
-    std::ostream& begin_file(const std::filesystem::path& relative_path, const std::uint64_t original_size) override {
+    std::ostream& begin_file(const std::filesystem::path& relative_path,
+                             const std::uint64_t original_size,
+                             const utils::FileMetadata& metadata) override {
         if (file_open_) {
             throw std::runtime_error("archive file payload is already open");
         }
 
         current_relative_path_ = utils::PathUtils::normalize_for_storage(relative_path);
         current_original_size_ = original_size;
+        current_metadata_ = metadata;
         current_header_position_ = archive_.tellp();
         if (current_header_position_ == std::streampos(-1)) {
             throw std::runtime_error("failed to capture archive header position");
@@ -378,7 +415,7 @@ public:
 
         write_archive_entry_header(
             archive_,
-            ArchiveEntry {ArchiveEntryType::regular_file, current_relative_path_, 0, current_original_size_, 0});
+            ArchiveEntry {ArchiveEntryType::regular_file, current_relative_path_, 0, current_original_size_, 0, current_metadata_});
 
         payload_stream_ = std::make_unique<HashingOutputStream>(archive_);
         file_open_ = true;
@@ -406,6 +443,7 @@ public:
             payload_stream_->bytes_written(),
             current_original_size_,
             payload_stream_->hash(),
+            current_metadata_,
         };
 
         archive_.seekp(current_header_position_);
@@ -429,7 +467,7 @@ public:
         if (!root_written_) {
             throw std::runtime_error("archive root entry was not written");
         }
-        write_archive_entry_header(archive_, ArchiveEntry {ArchiveEntryType::end_of_archive, {}, 0, 0, 0});
+        write_archive_entry_header(archive_, ArchiveEntry {ArchiveEntryType::end_of_archive, {}, 0, 0, 0, {}});
         archive_.flush();
         if (!archive_) {
             throw std::runtime_error("failed to finalize archive");
@@ -442,6 +480,7 @@ private:
     bool file_open_ {false};
     std::filesystem::path current_relative_path_;
     std::uint64_t current_original_size_ {0};
+    utils::FileMetadata current_metadata_ {};
     std::streampos current_header_position_ {};
     std::unique_ptr<HashingOutputStream> payload_stream_;
 };

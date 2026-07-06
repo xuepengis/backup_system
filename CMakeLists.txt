@@ -13,6 +13,7 @@ add_executable(backup_cli
     src/core/backup_engine.cpp
     src/strategy/archive_strategy.cpp
     src/utils/logger.cpp
+    src/utils/metadata_utils.cpp
     src/utils/path_utils.cpp
 )
 

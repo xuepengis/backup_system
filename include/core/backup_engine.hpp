@@ -3,10 +3,12 @@
 #include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 #include "strategy/iarchive_strategy.hpp"
 #include "strategy/ifile_filter.hpp"
 #include "strategy/istream_processor.hpp"
+#include "utils/metadata_utils.hpp"
 
 namespace backup_system::core {
 
@@ -30,6 +32,11 @@ public:
     void restore(const RestoreOptions& options) const;
 
 private:
+    struct DeferredMetadataEntry {
+        std::filesystem::path target_path;
+        utils::FileMetadata metadata;
+    };
+
     void validate_backup_options(const BackupOptions& options) const;
     void validate_restore_options(const RestoreOptions& options) const;
 
@@ -42,11 +49,14 @@ private:
                              strategy::IArchiveWriter& archive_writer) const;
 
     void restore_directory(const strategy::ArchiveEntry& entry,
-                           const std::filesystem::path& restore_root) const;
+                           const std::filesystem::path& restore_root,
+                           std::vector<DeferredMetadataEntry>& deferred_metadata) const;
 
     void restore_regular_file(const strategy::ArchiveEntry& entry,
                               strategy::IArchiveReader& archive_reader,
                               const std::filesystem::path& restore_root) const;
+
+    void apply_deferred_directory_metadata(const std::vector<DeferredMetadataEntry>& deferred_metadata) const;
 
     std::shared_ptr<strategy::IFileFilter> filter_;
     std::shared_ptr<strategy::IStreamProcessor> stream_processor_;

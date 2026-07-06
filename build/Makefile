@@ -225,6 +225,30 @@ src/utils/logger.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/logger.cpp.s
 .PHONY : src/utils/logger.cpp.s
 
+src/utils/metadata_utils.o: src/utils/metadata_utils.cpp.o
+.PHONY : src/utils/metadata_utils.o
+
+# target to build an object file
+src/utils/metadata_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.o
+.PHONY : src/utils/metadata_utils.cpp.o
+
+src/utils/metadata_utils.i: src/utils/metadata_utils.cpp.i
+.PHONY : src/utils/metadata_utils.i
+
+# target to preprocess a source file
+src/utils/metadata_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.i
+.PHONY : src/utils/metadata_utils.cpp.i
+
+src/utils/metadata_utils.s: src/utils/metadata_utils.cpp.s
+.PHONY : src/utils/metadata_utils.s
+
+# target to generate assembly for a file
+src/utils/metadata_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/metadata_utils.cpp.s
+.PHONY : src/utils/metadata_utils.cpp.s
+
 src/utils/path_utils.o: src/utils/path_utils.cpp.o
 .PHONY : src/utils/path_utils.o
 
@@ -270,6 +294,9 @@ help:
 	@echo "... src/utils/logger.o"
 	@echo "... src/utils/logger.i"
 	@echo "... src/utils/logger.s"
+	@echo "... src/utils/metadata_utils.o"
+	@echo "... src/utils/metadata_utils.i"
+	@echo "... src/utils/metadata_utils.s"
 	@echo "... src/utils/path_utils.o"
 	@echo "... src/utils/path_utils.i"
 	@echo "... src/utils/path_utils.s"
