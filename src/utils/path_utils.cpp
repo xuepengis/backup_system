@@ -1,5 +1,6 @@
 #include "utils/path_utils.hpp"
 
+#include <filesystem>
 #include <stdexcept>
 
 namespace backup_system::utils {
@@ -11,6 +12,11 @@ std::filesystem::path PathUtils::normalize_for_storage(const std::filesystem::pa
     }
     if (normalized.is_absolute()) {
         throw std::invalid_argument("storage path must be relative");
+    }
+    for (const auto& component : normalized) {
+        if (component == "..") {
+            throw std::invalid_argument("storage path must not escape the archive root");
+        }
     }
     return normalized;
 }

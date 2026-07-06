@@ -10,7 +10,6 @@
 
 #include <sys/stat.h>
 
-#include "utils/metadata_utils.hpp"
 #include "utils/path_utils.hpp"
 
 namespace backup_system::strategy {
@@ -18,7 +17,7 @@ namespace backup_system::strategy {
 namespace {
 
 constexpr std::array<char, 4> kArchiveMagic {'B', 'K', 'S', '1'};
-constexpr std::uint16_t kArchiveVersion = 2;
+constexpr std::uint16_t kArchiveVersion = 3;
 constexpr std::uint16_t kArchiveFlags = 0;
 constexpr std::uint64_t kFnvOffsetBasis = 14695981039346656037ULL;
 constexpr std::uint64_t kFnvPrime = 1099511628211ULL;
@@ -51,6 +50,26 @@ std::uint64_t fnv1a_update(std::uint64_t hash, const char* data, const std::size
 
 std::uint64_t checksum_path(const std::string& path_text) {
     return fnv1a_update(kFnvOffsetBasis, path_text.data(), path_text.size());
+}
+
+void write_string(std::ostream& output, const std::string& value) {
+    write_binary(output, static_cast<std::uint16_t>(value.size()));
+    output.write(value.data(), static_cast<std::streamsize>(value.size()));
+    if (!output) {
+        throw std::runtime_error("failed to write archive string");
+    }
+}
+
+std::string read_string(std::istream& input) {
+    const auto size = read_binary<std::uint16_t>(input);
+    std::string value(size, '\0');
+    if (size > 0) {
+        input.read(value.data(), static_cast<std::streamsize>(size));
+        if (!input) {
+            throw std::runtime_error("failed to read archive string");
+        }
+    }
+    return value;
 }
 
 class LimitedStreamBuffer : public std::streambuf {
@@ -234,16 +253,18 @@ private:
     HashingOutputStreamBuffer buffer_;
 };
 
-void write_archive_header(std::ostream& archive) {
+void write_archive_header(std::ostream& archive, const PayloadCodecDescriptor& descriptor) {
     archive.write(kArchiveMagic.data(), static_cast<std::streamsize>(kArchiveMagic.size()));
     if (!archive) {
         throw std::runtime_error("failed to write archive header");
     }
     write_binary(archive, kArchiveVersion);
     write_binary(archive, kArchiveFlags);
+    write_string(archive, descriptor.compression_name);
+    write_string(archive, descriptor.encryption_name);
 }
 
-void verify_archive_header(std::istream& archive) {
+PayloadCodecDescriptor verify_archive_header(std::istream& archive) {
     std::array<char, 4> magic {};
     archive.read(magic.data(), static_cast<std::streamsize>(magic.size()));
     if (!archive) {
@@ -261,6 +282,10 @@ void verify_archive_header(std::istream& archive) {
     if (flags != kArchiveFlags) {
         throw std::runtime_error("unsupported archive flags: " + std::to_string(flags));
     }
+    return {
+        .compression_name = read_string(archive),
+        .encryption_name = read_string(archive),
+    };
 }
 
 void write_archive_entry_header(std::ostream& archive, const ArchiveEntry& entry) {
@@ -281,6 +306,7 @@ void write_archive_entry_header(std::ostream& archive, const ArchiveEntry& entry
     write_binary(archive, entry.stored_size);
     write_binary(archive, entry.original_size);
     write_binary(archive, entry.checksum);
+    write_binary(archive, entry.content_checksum);
     write_binary(archive, entry.metadata.mode);
     write_binary(archive, entry.metadata.access_time_sec);
     write_binary(archive, entry.metadata.access_time_nsec);
@@ -311,6 +337,7 @@ ArchiveEntry read_archive_entry_header(std::istream& archive) {
     entry.stored_size = read_binary<std::uint64_t>(archive);
     entry.original_size = read_binary<std::uint64_t>(archive);
     entry.checksum = read_binary<std::uint64_t>(archive);
+    entry.content_checksum = read_binary<std::uint64_t>(archive);
     entry.metadata.mode = read_binary<std::uint32_t>(archive);
     entry.metadata.access_time_sec = read_binary<std::int64_t>(archive);
     entry.metadata.access_time_nsec = read_binary<std::int64_t>(archive);
@@ -330,6 +357,9 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         if (entry.stored_size != 0 || entry.original_size != 0) {
             throw std::runtime_error("directory entry must not contain payload sizes");
         }
+        if (entry.content_checksum != 0) {
+            throw std::runtime_error("directory entry must not contain content checksum");
+        }
         if (checksum_path(utils::PathUtils::to_generic_string(entry.relative_path)) != entry.checksum) {
             throw std::runtime_error("directory entry checksum mismatch");
         }
@@ -347,6 +377,9 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         if (entry.checksum == 0 && entry.stored_size != 0) {
             throw std::runtime_error("regular file entry with payload must contain a checksum");
         }
+        if (entry.content_checksum == 0 && entry.original_size != 0) {
+            throw std::runtime_error("regular file entry with content must contain a content checksum");
+        }
         if ((entry.metadata.mode & S_IFMT) != S_IFREG) {
             throw std::runtime_error("regular file entry metadata mode mismatch");
         }
@@ -355,7 +388,7 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
         if (!entry.relative_path.empty()) {
             throw std::runtime_error("end-of-archive entry must not contain a path");
         }
-        if (entry.stored_size != 0 || entry.original_size != 0 || entry.checksum != 0) {
+        if (entry.stored_size != 0 || entry.original_size != 0 || entry.checksum != 0 || entry.content_checksum != 0) {
             throw std::runtime_error("end-of-archive entry must have zeroed metadata");
         }
         if (entry.metadata.mode != 0 ||
@@ -378,12 +411,13 @@ void validate_archive_entry(const ArchiveEntry& entry, const bool is_first_entry
 
 class BinaryArchiveWriter final : public IArchiveWriter {
 public:
-    explicit BinaryArchiveWriter(const std::filesystem::path& archive_path)
-        : archive_(archive_path, std::ios::binary | std::ios::trunc) {
+    BinaryArchiveWriter(const std::filesystem::path& archive_path, PayloadCodecDescriptor descriptor)
+        : archive_(archive_path, std::ios::binary | std::ios::trunc),
+          descriptor_(std::move(descriptor)) {
         if (!archive_) {
             throw std::runtime_error("failed to open archive for writing");
         }
-        write_archive_header(archive_);
+        write_archive_header(archive_, descriptor_);
     }
 
     void write_directory(const std::filesystem::path& relative_path,
@@ -392,7 +426,7 @@ public:
         const auto path_text = utils::PathUtils::to_generic_string(normalized_path);
         write_archive_entry_header(
             archive_,
-            ArchiveEntry {ArchiveEntryType::directory, normalized_path, 0, 0, checksum_path(path_text), metadata});
+            ArchiveEntry {ArchiveEntryType::directory, normalized_path, 0, 0, checksum_path(path_text), 0, metadata});
         if (normalized_path == ".") {
             root_written_ = true;
         }
@@ -400,6 +434,7 @@ public:
 
     std::ostream& begin_file(const std::filesystem::path& relative_path,
                              const std::uint64_t original_size,
+                             const std::uint64_t content_checksum,
                              const utils::FileMetadata& metadata) override {
         if (file_open_) {
             throw std::runtime_error("archive file payload is already open");
@@ -407,6 +442,7 @@ public:
 
         current_relative_path_ = utils::PathUtils::normalize_for_storage(relative_path);
         current_original_size_ = original_size;
+        current_content_checksum_ = content_checksum;
         current_metadata_ = metadata;
         current_header_position_ = archive_.tellp();
         if (current_header_position_ == std::streampos(-1)) {
@@ -415,7 +451,15 @@ public:
 
         write_archive_entry_header(
             archive_,
-            ArchiveEntry {ArchiveEntryType::regular_file, current_relative_path_, 0, current_original_size_, 0, current_metadata_});
+            ArchiveEntry {
+                ArchiveEntryType::regular_file,
+                current_relative_path_,
+                0,
+                current_original_size_,
+                0,
+                current_content_checksum_,
+                current_metadata_,
+            });
 
         payload_stream_ = std::make_unique<HashingOutputStream>(archive_);
         file_open_ = true;
@@ -443,6 +487,7 @@ public:
             payload_stream_->bytes_written(),
             current_original_size_,
             payload_stream_->hash(),
+            current_content_checksum_,
             current_metadata_,
         };
 
@@ -467,7 +512,7 @@ public:
         if (!root_written_) {
             throw std::runtime_error("archive root entry was not written");
         }
-        write_archive_entry_header(archive_, ArchiveEntry {ArchiveEntryType::end_of_archive, {}, 0, 0, 0, {}});
+        write_archive_entry_header(archive_, ArchiveEntry {ArchiveEntryType::end_of_archive, {}, 0, 0, 0, 0, {}});
         archive_.flush();
         if (!archive_) {
             throw std::runtime_error("failed to finalize archive");
@@ -480,19 +525,33 @@ private:
     bool file_open_ {false};
     std::filesystem::path current_relative_path_;
     std::uint64_t current_original_size_ {0};
+    std::uint64_t current_content_checksum_ {0};
     utils::FileMetadata current_metadata_ {};
     std::streampos current_header_position_ {};
     std::unique_ptr<HashingOutputStream> payload_stream_;
+    PayloadCodecDescriptor descriptor_;
 };
 
 class BinaryArchiveReader final : public IArchiveReader {
 public:
-    explicit BinaryArchiveReader(const std::filesystem::path& archive_path)
-        : archive_(archive_path, std::ios::binary) {
+    BinaryArchiveReader(const std::filesystem::path& archive_path, PayloadCodecDescriptor descriptor)
+        : archive_(archive_path, std::ios::binary),
+          expected_descriptor_(std::move(descriptor)) {
         if (!archive_) {
             throw std::runtime_error("failed to open archive for reading");
         }
-        verify_archive_header(archive_);
+
+        const auto actual_descriptor = verify_archive_header(archive_);
+        if (actual_descriptor.compression_name != expected_descriptor_.compression_name) {
+            throw std::runtime_error(
+                "archive compression codec mismatch: archive=" + actual_descriptor.compression_name +
+                ", expected=" + expected_descriptor_.compression_name);
+        }
+        if (actual_descriptor.encryption_name != expected_descriptor_.encryption_name) {
+            throw std::runtime_error(
+                "archive encryption codec mismatch: archive=" + actual_descriptor.encryption_name +
+                ", expected=" + expected_descriptor_.encryption_name);
+        }
     }
 
     ArchiveEntry read_next_entry() override {
@@ -553,20 +612,25 @@ private:
     bool pending_file_ {false};
     ArchiveEntry current_entry_ {};
     std::unique_ptr<HashingLimitedInputStream> payload_stream_;
+    PayloadCodecDescriptor expected_descriptor_;
 };
 
 }  // namespace
 
+BinaryArchiveStrategy::BinaryArchiveStrategy(PayloadCodecDescriptor descriptor)
+    : descriptor_(std::move(descriptor)) {
+}
+
 std::unique_ptr<IArchiveWriter> BinaryArchiveStrategy::create_writer(const std::filesystem::path& archive_path) const {
-    return std::make_unique<BinaryArchiveWriter>(archive_path);
+    return std::make_unique<BinaryArchiveWriter>(archive_path, descriptor_);
 }
 
 std::unique_ptr<IArchiveReader> BinaryArchiveStrategy::create_reader(const std::filesystem::path& archive_path) const {
-    return std::make_unique<BinaryArchiveReader>(archive_path);
+    return std::make_unique<BinaryArchiveReader>(archive_path, descriptor_);
 }
 
 std::string BinaryArchiveStrategy::name() const {
-    return "binary-archive-v1";
+    return "binary-archive-v3";
 }
 
 }  // namespace backup_system::strategy

@@ -215,6 +215,7 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
  /usr/include/c++/11/bits/uses_allocator_args.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
  /usr/include/c++/11/pstl/execution_defs.h \
+ /data/users/pennxue/backup_system/include/strategy/istream_processor.hpp \
  /data/users/pennxue/backup_system/include/utils/metadata_utils.hpp \
  /usr/include/c++/11/cstddef /usr/include/c++/11/fstream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \

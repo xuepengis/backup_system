@@ -201,6 +201,54 @@ src/strategy/archive_strategy.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.s
 .PHONY : src/strategy/archive_strategy.cpp.s
 
+src/strategy/codec_registry.o: src/strategy/codec_registry.cpp.o
+.PHONY : src/strategy/codec_registry.o
+
+# target to build an object file
+src/strategy/codec_registry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o
+.PHONY : src/strategy/codec_registry.cpp.o
+
+src/strategy/codec_registry.i: src/strategy/codec_registry.cpp.i
+.PHONY : src/strategy/codec_registry.i
+
+# target to preprocess a source file
+src/strategy/codec_registry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.i
+.PHONY : src/strategy/codec_registry.cpp.i
+
+src/strategy/codec_registry.s: src/strategy/codec_registry.cpp.s
+.PHONY : src/strategy/codec_registry.s
+
+# target to generate assembly for a file
+src/strategy/codec_registry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.s
+.PHONY : src/strategy/codec_registry.cpp.s
+
+src/strategy/stream_processor.o: src/strategy/stream_processor.cpp.o
+.PHONY : src/strategy/stream_processor.o
+
+# target to build an object file
+src/strategy/stream_processor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.o
+.PHONY : src/strategy/stream_processor.cpp.o
+
+src/strategy/stream_processor.i: src/strategy/stream_processor.cpp.i
+.PHONY : src/strategy/stream_processor.i
+
+# target to preprocess a source file
+src/strategy/stream_processor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.i
+.PHONY : src/strategy/stream_processor.cpp.i
+
+src/strategy/stream_processor.s: src/strategy/stream_processor.cpp.s
+.PHONY : src/strategy/stream_processor.s
+
+# target to generate assembly for a file
+src/strategy/stream_processor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.s
+.PHONY : src/strategy/stream_processor.cpp.s
+
 src/utils/logger.o: src/utils/logger.cpp.o
 .PHONY : src/utils/logger.o
 
@@ -291,6 +339,12 @@ help:
 	@echo "... src/strategy/archive_strategy.o"
 	@echo "... src/strategy/archive_strategy.i"
 	@echo "... src/strategy/archive_strategy.s"
+	@echo "... src/strategy/codec_registry.o"
+	@echo "... src/strategy/codec_registry.i"
+	@echo "... src/strategy/codec_registry.s"
+	@echo "... src/strategy/stream_processor.o"
+	@echo "... src/strategy/stream_processor.i"
+	@echo "... src/strategy/stream_processor.s"
 	@echo "... src/utils/logger.o"
 	@echo "... src/utils/logger.i"
 	@echo "... src/utils/logger.s"

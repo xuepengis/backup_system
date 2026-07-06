@@ -81,12 +81,12 @@ clean: CMakeFiles/backup_cli.dir/clean
 CMakeFiles/backup_cli.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Built target backup_cli"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/data/users/pennxue/backup_system/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9 "Built target backup_cli"
 .PHONY : CMakeFiles/backup_cli.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/backup_cli.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /data/users/pennxue/backup_system/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /data/users/pennxue/backup_system/build/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/backup_cli.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /data/users/pennxue/backup_system/build/CMakeFiles 0
 .PHONY : CMakeFiles/backup_cli.dir/rule

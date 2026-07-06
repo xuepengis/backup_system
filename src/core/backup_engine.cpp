@@ -17,51 +17,40 @@ bool PassThroughFileFilter::should_include(const std::filesystem::directory_entr
     return true;
 }
 
-namespace {
-
-void copy_stream(std::istream& input, std::ostream& output) {
-    std::array<char, 64 * 1024> buffer {};
-
-    while (input) {
-        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
-        const auto bytes_read = input.gcount();
-        if (bytes_read > 0) {
-            output.write(buffer.data(), bytes_read);
-        }
-    }
-
-    if (!input.eof()) {
-        throw std::runtime_error("stream copy failed while reading input");
-    }
-
-    if (!output) {
-        throw std::runtime_error("stream copy failed while writing output");
-    }
-}
-
-}  // namespace
-
-void DirectCopyStreamProcessor::backup(std::istream& input,
-                                       std::ostream& output,
-                                       const std::filesystem::path& source_path) const {
-    (void)source_path;
-    copy_stream(input, output);
-}
-
-void DirectCopyStreamProcessor::restore(std::istream& input,
-                                        std::ostream& output,
-                                        const std::filesystem::path& archived_path) const {
-    (void)archived_path;
-    copy_stream(input, output);
-}
-
 }  // namespace backup_system::strategy
 
 namespace backup_system::core {
 
 namespace {
+
 std::string describe_path(const std::filesystem::path& path) {
     return path.string();
+}
+
+std::uint64_t compute_file_checksum(const std::filesystem::path& path) {
+    constexpr std::uint64_t kFnvOffsetBasis = 14695981039346656037ULL;
+    constexpr std::uint64_t kFnvPrime = 1099511628211ULL;
+
+    std::ifstream input(path, std::ios::binary);
+    if (!input) {
+        throw std::runtime_error("failed to open file for checksum: " + path.string());
+    }
+
+    std::uint64_t hash = kFnvOffsetBasis;
+    std::array<char, 64 * 1024> buffer {};
+    while (input) {
+        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const auto bytes_read = input.gcount();
+        for (std::streamsize index = 0; index < bytes_read; ++index) {
+            hash ^= static_cast<unsigned char>(buffer[static_cast<std::size_t>(index)]);
+            hash *= kFnvPrime;
+        }
+    }
+
+    if (!input.eof()) {
+        throw std::runtime_error("failed while computing checksum for: " + path.string());
+    }
+    return hash;
 }
 
 }  // namespace
@@ -189,9 +178,11 @@ void BackupEngine::backup_regular_file(const std::filesystem::path& source_path,
     }
 
     const auto original_size = static_cast<std::uint64_t>(std::filesystem::file_size(source_path));
+    const auto content_checksum = compute_file_checksum(source_path);
     auto& archive_output = archive_writer.begin_file(
         relative_path,
         original_size,
+        content_checksum,
         utils::MetadataUtils::collect(source_path));
     stream_processor_->backup(input, archive_output, source_path);
     archive_writer.end_file();
@@ -227,10 +218,15 @@ void BackupEngine::restore_regular_file(const strategy::ArchiveEntry& entry,
     if (!output) {
         throw std::runtime_error("failed to flush restore file: " + target_path.string());
     }
+
     const auto restored_size = static_cast<std::uint64_t>(std::filesystem::file_size(target_path));
     if (restored_size != entry.original_size) {
         throw std::runtime_error("restored file size does not match archive metadata for: " + target_path.string());
     }
+    if (compute_file_checksum(target_path) != entry.content_checksum) {
+        throw std::runtime_error("restored file checksum does not match archive metadata for: " + target_path.string());
+    }
+
     utils::MetadataUtils::apply(target_path, entry.metadata);
 }
 

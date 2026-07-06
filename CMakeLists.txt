@@ -12,6 +12,8 @@ add_executable(backup_cli
     main.cpp
     src/core/backup_engine.cpp
     src/strategy/archive_strategy.cpp
+    src/strategy/codec_registry.cpp
+    src/strategy/stream_processor.cpp
     src/utils/logger.cpp
     src/utils/metadata_utils.cpp
     src/utils/path_utils.cpp
