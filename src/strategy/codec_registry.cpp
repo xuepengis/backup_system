@@ -1,6 +1,8 @@
 #include "strategy/codec_registry.hpp"
 
+#include "strategy/aes_gcm_codec.hpp"
 #include "strategy/bwt_codec.hpp"
+#include "strategy/chacha20_poly1305_codec.hpp"
 #include "strategy/huffman_codec.hpp"
 #include "strategy/lz77_codec.hpp"
 
@@ -242,6 +244,8 @@ const std::map<std::string, CompressionFactory>& compression_registry() {
 const std::map<std::string, EncryptionFactory>& encryption_registry() {
     static const std::map<std::string, EncryptionFactory> registry {
         {"none", [] { return std::make_shared<NoEncryptionCodec>(); }},
+        {"aes-256-gcm", [] { return std::make_shared<AesGcmEncryptionCodec>(); }},
+        {"chacha20-poly1305", [] { return std::make_shared<ChaCha20Poly1305EncryptionCodec>(); }},
         {"xor-stream", [] { return std::make_shared<XorStreamEncryptionCodec>(); }},
     };
     return registry;

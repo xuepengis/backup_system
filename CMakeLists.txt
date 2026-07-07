@@ -8,11 +8,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(backup_cli
     main.cpp
     src/app/cli_parser.cpp
     src/core/backup_engine.cpp
+    src/strategy/aes_gcm_codec.cpp
     src/strategy/archive_strategy.cpp
+    src/strategy/chacha20_poly1305_codec.cpp
     src/strategy/codec_registry.cpp
     src/strategy/bwt_codec.cpp
     src/utils/huffman_coding.cpp
@@ -30,4 +34,9 @@ add_executable(backup_cli
 target_include_directories(backup_cli
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(backup_cli
+    PRIVATE
+        OpenSSL::Crypto
 )

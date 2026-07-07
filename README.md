@@ -86,10 +86,15 @@
 当前已实现：
 - `none`
 - `xor-stream`
+- `aes-256-gcm`
+- `chacha20-poly1305`
 
 说明：
 - `xor-stream` 是手写轻量原型算法，只用于打通加密接口与归档链路
-- 它不是强密码学安全方案，不能替代成熟加密算法
+- `aes-256-gcm` 是基于 OpenSSL EVP 的 AES-256-GCM 认证加密，行业标准，具备篡改检测能力
+- `chacha20-poly1305` 是基于 OpenSSL EVP 的 ChaCha20-Poly1305 认证加密，现代算法，纯软件也极快
+- 两者均使用 PBKDF2-HMAC-SHA256（10 万次迭代）从密码派生 256 位密钥，每次加密使用随机盐值和随机 IV/Nonce
+- GCM / Poly1305 认证标签可在解密阶段检测密码错误或数据篡改，比还原后的 checksum 校验更早发现问题
 
 ### 2.6 归档格式
 
@@ -133,15 +138,17 @@ backup_system/
 │   ├── core/
 │   │   └── backup_engine.hpp
 │   ├── strategy/
+│   │   ├── aes_gcm_codec.hpp
+│   │   ├── bwt_codec.hpp
+│   │   ├── chacha20_poly1305_codec.hpp
 │   │   ├── codec_registry.hpp
 │   │   ├── filter_registry.hpp
 │   │   ├── filter_spec_builder.hpp
 │   │   ├── huffman_codec.hpp
-│   │   ├── lz77_codec.hpp
-│   │   ├── bwt_codec.hpp
 │   │   ├── iarchive_strategy.hpp
 │   │   ├── ifile_filter.hpp
-│   │   └── istream_processor.hpp
+│   │   ├── istream_processor.hpp
+│   │   └── lz77_codec.hpp
 │   └── utils/
 │       ├── logger.hpp
 │       ├── metadata_utils.hpp
@@ -151,16 +158,18 @@ backup_system/
     │   └── cli_parser.cpp
     ├── core/
     │   └── backup_engine.cpp
-    ├── strategy/
-    │   ├── archive_strategy.cpp
-    │   ├── codec_registry.cpp
-    │   ├── file_filter.cpp
-    │   ├── filter_registry.cpp
-    │   ├── filter_spec_builder.cpp
-│   │   ├── huffman_codec.cpp
-│   │   ├── lz77_codec.cpp
-│   │   ├── bwt_codec.cpp
-│   │   └── stream_processor.cpp
+	    ├── strategy/
+	    │   ├── aes_gcm_codec.cpp
+	    │   ├── archive_strategy.cpp
+	    │   ├── bwt_codec.cpp
+	    │   ├── chacha20_poly1305_codec.cpp
+	    │   ├── codec_registry.cpp
+	    │   ├── file_filter.cpp
+	    │   ├── filter_registry.cpp
+	    │   ├── filter_spec_builder.cpp
+	    │   ├── huffman_codec.cpp
+	    │   ├── lz77_codec.cpp
+	    │   └── stream_processor.cpp
     └── utils/
         ├── logger.cpp
         ├── metadata_utils.cpp
@@ -316,6 +325,8 @@ backup_system/
 - encryption:
   - `none`
   - `xor-stream`
+  - `aes-256-gcm`
+  - `chacha20-poly1305`
 
 这样设计的好处：
 - 新增算法时只需要在注册表登记
@@ -457,6 +468,15 @@ backup_system/
 - CMake >= 3.16
 - 支持 C++20 的编译器
   - 例如 `g++-11` 或以上
+- OpenSSL 3.x 开发包（`libssl-dev`）
+
+> **关于 OpenSSL 依赖说明：**
+>
+> - **编译时需要** `libssl-dev`（提供 `openssl/evp.h` 等头文件），需手动安装：
+>   ```bash
+>   sudo apt install libssl-dev
+>   ```
+> - **运行时无需额外安装任何东西。** `libssl3`（含 `libcrypto.so.3`）是 Ubuntu 22.04 的 `Priority: required` 包——`systemd`、`openssh-client`、`python3` 等核心组件均依赖它，任何 Ubuntu 22.04 系统已默认包含。编译产出的 `backup_cli` 二进制可直接在任何 Ubuntu 22.04 系统上运行。
 
 ### 7.2 构建命令
 
@@ -635,15 +655,61 @@ cmake --build .
   --password secret123
 ```
 
-### 9.8 同时启用压缩和加密
+### 9.8 使用 AES-256-GCM 加密
+
+```bash
+./build/backup_cli \
+  --mode backup \
+  --src ./data \
+  --dest ./backup_aes.bks \
+  --encryption aes-256-gcm \
+  --password secret123
+```
+
+还原：
+
+```bash
+./build/backup_cli \
+  --mode restore \
+  --src ./backup_aes.bks \
+  --dest ./restore_aes \
+  --encryption aes-256-gcm \
+  --password secret123
+```
+
+如果密码错误或归档文件被篡改，解密时 GCM 标签验证会失败，立即报错阻止还原。
+
+### 9.9 使用 ChaCha20-Poly1305 加密
+
+```bash
+./build/backup_cli \
+  --mode backup \
+  --src ./data \
+  --dest ./backup_chacha.bks \
+  --encryption chacha20-poly1305 \
+  --password secret123
+```
+
+还原：
+
+```bash
+./build/backup_cli \
+  --mode restore \
+  --src ./backup_chacha.bks \
+  --dest ./restore_chacha \
+  --encryption chacha20-poly1305 \
+  --password secret123
+```
+
+### 9.10 同时启用压缩和强加密
 
 ```bash
 ./build/backup_cli \
   --mode backup \
   --src ./data \
   --dest ./backup_secure.bks \
-  --compression rle \
-  --encryption xor-stream \
+  --compression bwt \
+  --encryption aes-256-gcm \
   --password secret123
 ```
 
@@ -654,12 +720,12 @@ cmake --build .
   --mode restore \
   --src ./backup_secure.bks \
   --dest ./restore_secure \
-  --compression rle \
-  --encryption xor-stream \
+  --compression bwt \
+  --encryption aes-256-gcm \
   --password secret123
 ```
 
-### 9.9 路径过滤
+### 9.11 路径过滤
 
 只备份 `docs/` 目录下文件：
 
@@ -671,7 +737,7 @@ cmake --build .
   --include-path "docs/*"
 ```
 
-### 9.10 文件名过滤
+### 9.12 文件名过滤
 
 只备份日志文件：
 
@@ -683,7 +749,7 @@ cmake --build .
   --include-name "*.log"
 ```
 
-### 9.11 尺寸过滤
+### 9.13 尺寸过滤
 
 只备份大小在 1KB 到 1MB 之间的文件：
 
@@ -696,7 +762,7 @@ cmake --build .
   --max-size 1048576
 ```
 
-### 9.12 时间过滤
+### 9.14 时间过滤
 
 只备份 2025 年 1 月 1 日之后修改的文件：
 
@@ -708,7 +774,7 @@ cmake --build .
   --modified-after 2025-01-01T00:00:00
 ```
 
-### 9.13 多条件组合过滤
+### 9.15 多条件组合过滤
 
 只备份：
 - 位于 `docs/` 下
@@ -836,6 +902,38 @@ BwtCompressionCodec 实现了完整的 BWT 压缩管线：
 - 重复文本 22KB 可压缩至 5KB（约 77% 压缩率）。
 
 
+### 11.7 AES-256-GCM 加密实现
+
+AesGcmEncryptionCodec 是基于 OpenSSL EVP 的 AES-256-GCM 认证加密实现：
+
+1. **密钥派生**：PBKDF2-HMAC-SHA256，10 万次迭代，从用户密码派生 256 位密钥，每次加密使用随机 16 字节盐值。
+2. **加密**：随机 12 字节 IV，AES-256-GCM 模式加密，生成 16 字节 GCM 认证标签。
+3. **解密**：从盐值重建密钥，设定预期 GCM 标签后解密，OpenSSL 自动验证标签。
+
+归档格式：
+- 16 字节 PBKDF2 盐值 + 12 字节 IV + 密文 + 16 字节 GCM 标签
+
+安全特性：
+- 认证加密：标签验证失败（密码错误或数据篡改）时解密立即失败，不会输出错误明文。
+- 随机盐值 + 随机 IV：相同密码加密相同数据，每次产生完全不同的密文。
+- AES-NI 硬件加速：现代 CPU 上加密/解密速度极快。
+
+### 11.8 ChaCha20-Poly1305 加密实现
+
+ChaCha20Poly1305EncryptionCodec 是基于 OpenSSL EVP 的 ChaCha20-Poly1305 认证加密实现：
+
+1. **密钥派生**：与 AES-256-GCM 相同，PBKDF2-HMAC-SHA256，10 万次迭代，16 字节盐值。
+2. **加密**：随机 12 字节 Nonce，ChaCha20 流密码，Poly1305 MAC 生成 16 字节认证标签。
+3. **解密**：从盐值重建密钥，设定预期 Poly1305 标签后解密并验证。
+
+归档格式：
+- 16 字节 PBKDF2 盐值 + 12 字节 Nonce + 密文 + 16 字节 Poly1305 标签
+
+安全特性：
+- 与 AES-256-GCM 相同的认证加密语义（密码错误/篡改立即检测）。
+- 纯软件实现极快，无 AES-NI 依赖，在移动端或嵌入式场景同样高效。
+- RFC 8439 标准算法，已被 TLS 1.3、WireGuard、SSH 等广泛采用。
+
 ### 11.4 临时文件
 
 当同时启用压缩和加密时，当前 `PipelineStreamProcessor` 使用临时文件串联两个阶段：
@@ -893,8 +991,8 @@ BwtCompressionCodec 实现了完整的 BWT 压缩管线：
 当前版本的已知限制：
 
 1. 仅支持普通文件和目录，不支持符号链接、设备文件、FIFO 等特殊文件。
-2. 当前加密算法 `xor-stream` 仅为原型实现，不具备强安全性。
-3. 当前压缩算法 `rle` 压缩效果有限，`huffman` 对高熵数据压缩率有限，`lz77` 在 4KB 窗口内查找匹配，`bwt` 在小文件上因频率表开销压缩率有限，后续可加入 LZ77 等更强算法。
+2. 当前 `xor-stream` 仅为原型实现，不具备强安全性；`aes-256-gcm` 和 `chacha20-poly1305` 为使用 OpenSSL 实现的认证加密，具备强安全性。
+3. 当前压缩算法 `rle` 压缩效果有限，`huffman` 对高熵数据压缩率有限，`lz77` 在 4KB 窗口内查找匹配，`bwt` 在小文件上因频率表开销压缩率有限，后续可加入更强算法。
 4. 同时启用压缩和加密时依赖临时文件，性能和空间效率仍有优化空间。
 5. 当前没有增量备份、版本管理、去重和快照功能。
 
