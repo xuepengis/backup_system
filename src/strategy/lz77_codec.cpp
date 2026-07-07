@@ -189,12 +189,6 @@ void Lz77CompressionCodec::compress(std::istream& input,
     int pos = 0;
 
     while (pos < static_cast<int>(data.size())) {
-        // Update hash for current position (before processing)
-        if (pos + 2 < static_cast<int>(data.size())) {
-            int h = hash3(data[pos], data[pos + 1], data[pos + 2]);
-            hash_table[h] = pos;
-        }
-
         auto [offset, length] = find_match(data, hash_table, pos);
 
         if (length >= kMinMatch) {
@@ -203,8 +197,8 @@ void Lz77CompressionCodec::compress(std::istream& input,
             writer.write_bits(static_cast<std::uint64_t>(offset - 1), 12);
             writer.write_bits(static_cast<std::uint64_t>(length - kMinMatch), 8);
 
-            // Update hash for all intermediate positions covered by the match
-            for (int i = 1; i < length && (pos + i + 2) < static_cast<int>(data.size()); ++i) {
+            // Update hash for all positions covered by the match
+            for (int i = 0; i < length && (pos + i + 2) < static_cast<int>(data.size()); ++i) {
                 int h = hash3(data[pos + i], data[pos + i + 1], data[pos + i + 2]);
                 hash_table[h] = pos + i;
             }
@@ -214,6 +208,13 @@ void Lz77CompressionCodec::compress(std::istream& input,
             // Emit literal token: flag=0 + 8-bit byte
             writer.write_bits(0, 1);
             writer.write_bits(data[pos], 8);
+
+            // Update hash AFTER emitting literal
+            if (pos + 2 < static_cast<int>(data.size())) {
+                int h = hash3(data[pos], data[pos + 1], data[pos + 2]);
+                hash_table[h] = pos;
+            }
+
             ++pos;
         }
     }
