@@ -15,6 +15,7 @@ add_executable(backup_cli
     src/strategy/archive_strategy.cpp
     src/strategy/codec_registry.cpp
     src/strategy/file_filter.cpp
+    src/strategy/huffman_codec.cpp
     src/strategy/filter_registry.cpp
     src/strategy/filter_spec_builder.cpp
     src/strategy/stream_processor.cpp

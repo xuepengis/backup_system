@@ -1,5 +1,7 @@
 #include "strategy/codec_registry.hpp"
 
+#include "strategy/huffman_codec.hpp"
+
 #include <array>
 #include <functional>
 #include <map>
@@ -228,6 +230,7 @@ const std::map<std::string, CompressionFactory>& compression_registry() {
     static const std::map<std::string, CompressionFactory> registry {
         {"none", [] { return std::make_shared<NoCompressionCodec>(); }},
         {"rle", [] { return std::make_shared<RleCompressionCodec>(); }},
+        {"huffman", [] { return std::make_shared<HuffmanCompressionCodec>(); }},
     };
     return registry;
 }
