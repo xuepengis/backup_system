@@ -14,6 +14,8 @@ add_executable(backup_cli
     src/core/backup_engine.cpp
     src/strategy/archive_strategy.cpp
     src/strategy/codec_registry.cpp
+    src/strategy/bwt_codec.cpp
+    src/utils/huffman_coding.cpp
     src/strategy/file_filter.cpp
     src/strategy/huffman_codec.cpp
     src/strategy/lz77_codec.cpp

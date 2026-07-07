@@ -72,11 +72,13 @@
 - `rle`
 - `huffman`
 - `lz77`
+- `bwt`
 
 说明：
 - `rle` 是最基础的游程编码实现，主要用于打通可扩展压缩接口
 - `huffman` 是标准霍夫曼编码实现，基于字节频率统计构建最优前缀码
 - `lz77` 是经典字典编码实现，通过滑动窗口发现重复子串，用 (偏移,长度) 引用替代原始数据
+- `bwt` (Burrows-Wheeler Transform) 是 bzip2 核心变换，通过排序旋转矩阵使相同字符聚集，配合 MTF 和 Huffman 实现高压缩率
 - `none` 为空操作，不进行压缩
 
 ### 2.5 加密 / 解密
@@ -136,6 +138,7 @@ backup_system/
 │   │   ├── filter_spec_builder.hpp
 │   │   ├── huffman_codec.hpp
 │   │   ├── lz77_codec.hpp
+│   │   ├── bwt_codec.hpp
 │   │   ├── iarchive_strategy.hpp
 │   │   ├── ifile_filter.hpp
 │   │   └── istream_processor.hpp
@@ -156,6 +159,7 @@ backup_system/
     │   ├── filter_spec_builder.cpp
 │   │   ├── huffman_codec.cpp
 │   │   ├── lz77_codec.cpp
+│   │   ├── bwt_codec.cpp
 │   │   └── stream_processor.cpp
     └── utils/
         ├── logger.cpp
@@ -308,6 +312,7 @@ backup_system/
   - `rle`
   - `huffman`
   - `lz77`
+  - `bwt`
 - encryption:
   - `none`
   - `xor-stream`
@@ -440,7 +445,7 @@ backup_system/
 
 ### 6.4 先做“可扩展正确架构”，再叠加更多算法
 
-当前的 `none` 只是空操作，`rle` 和 `xor-stream` 是原型算法，`huffman` 和 `lz77` 是正式压缩实现。接口已经稳定，后续替换更强算法时，基本不需要碰引擎主流程。
+当前的 `none` 只是空操作，`rle` 和 `xor-stream` 是原型算法，`huffman`、`lz77` 和 `bwt` 是正式压缩实现。接口已经稳定，后续替换更强算法时，基本不需要碰引擎主流程。
 
 ---
 
@@ -499,7 +504,7 @@ cmake --build .
 | `--mode` | `backup` 或 `restore` |
 | `--src` | 备份时为源目录；还原时为归档文件 |
 | `--dest` | 备份时为归档文件；还原时为目标目录 |
-| `--compression` | 压缩算法，当前支持 `none` / `rle` / `huffman` / `lz77` |
+| `--compression` | 压缩算法，当前支持 `none` / `rle` / `huffman` / `lz77` / `bwt` |
 | `--encryption` | 加密算法，当前支持 `none` / `xor-stream` |
 | `--password` | 当启用加密时必须提供 |
 
@@ -568,7 +573,27 @@ cmake --build .
   --compression huffman
 ```
 
-### 9.5 使用 LZ77 压缩
+### 9.5 使用 BWT 压缩
+
+```bash
+./build/backup_cli \
+  --mode backup \
+  --src ./data \
+  --dest ./backup_bwt.bks \
+  --compression bwt
+```
+
+还原：
+
+```bash
+./build/backup_cli \
+  --mode restore \
+  --src ./backup_bwt.bks \
+  --dest ./restore_bwt \
+  --compression bwt
+```
+
+### 9.6 使用 LZ77 压缩
 
 ```bash
 ./build/backup_cli \
@@ -588,7 +613,7 @@ cmake --build .
   --compression lz77
 ```
 
-### 9.6 使用 XOR 流加密
+### 9.7 使用 XOR 流加密
 
 ```bash
 ./build/backup_cli \
@@ -610,7 +635,7 @@ cmake --build .
   --password secret123
 ```
 
-### 9.7 同时启用压缩和加密
+### 9.8 同时启用压缩和加密
 
 ```bash
 ./build/backup_cli \
@@ -634,7 +659,7 @@ cmake --build .
   --password secret123
 ```
 
-### 9.8 路径过滤
+### 9.9 路径过滤
 
 只备份 `docs/` 目录下文件：
 
@@ -646,7 +671,7 @@ cmake --build .
   --include-path "docs/*"
 ```
 
-### 9.9 文件名过滤
+### 9.10 文件名过滤
 
 只备份日志文件：
 
@@ -658,7 +683,7 @@ cmake --build .
   --include-name "*.log"
 ```
 
-### 9.10 尺寸过滤
+### 9.11 尺寸过滤
 
 只备份大小在 1KB 到 1MB 之间的文件：
 
@@ -671,7 +696,7 @@ cmake --build .
   --max-size 1048576
 ```
 
-### 9.11 时间过滤
+### 9.12 时间过滤
 
 只备份 2025 年 1 月 1 日之后修改的文件：
 
@@ -683,7 +708,7 @@ cmake --build .
   --modified-after 2025-01-01T00:00:00
 ```
 
-### 9.12 多条件组合过滤
+### 9.13 多条件组合过滤
 
 只备份：
 - 位于 `docs/` 下
@@ -792,6 +817,25 @@ Lz77CompressionCodec 是经典 LZ77 字典编码的完整实现：
 - 重叠引用（offset < length）：解压时逐字节复制，正确支持 RLE 类数据。
 
 
+### 11.6 BWT 压缩实现
+
+BwtCompressionCodec 实现了完整的 BWT 压缩管线：
+
+1. **BWT 正变换**：构建所有 N 个循环旋转，按字典序排列，取最后一列。相同字符聚集，为后续压缩创造条件。
+2. **MTF 编码**：维护 0-255 符号列表，将每个字节替换为其在列表中的位置索引，然后将该符号移到列表前端。连续相同字节产生大量 0 值。
+3. **Huffman 编码**：对 MTF 输出（高度偏斜的分布）进行最优前缀编码，短码分配给高频的 0/1/2 值。
+
+归档格式：
+- 8 字节原始大小 + 4 字节 primary\_index + Huffman 块（含自身 8 字节数据大小 + 256×8 字节频率表 + 比特流）
+
+解压逆序执行：Huffman 解码 → MTF 解码 → BWT 逆变换（基于表的重建算法）
+
+特殊处理：
+- 空输入：写入 header 后直接返回。
+- 小文件：Huffman 频率表有固定开销，对大文件压缩效果更显著。
+- 重复文本 22KB 可压缩至 5KB（约 77% 压缩率）。
+
+
 ### 11.4 临时文件
 
 当同时启用压缩和加密时，当前 `PipelineStreamProcessor` 使用临时文件串联两个阶段：
@@ -850,7 +894,7 @@ Lz77CompressionCodec 是经典 LZ77 字典编码的完整实现：
 
 1. 仅支持普通文件和目录，不支持符号链接、设备文件、FIFO 等特殊文件。
 2. 当前加密算法 `xor-stream` 仅为原型实现，不具备强安全性。
-3. 当前压缩算法 `rle` 压缩效果有限，`huffman` 对高熵数据压缩率有限，`lz77` 在 4KB 窗口内查找匹配，后续可加入 LZ77 等更强算法。
+3. 当前压缩算法 `rle` 压缩效果有限，`huffman` 对高熵数据压缩率有限，`lz77` 在 4KB 窗口内查找匹配，`bwt` 在小文件上因频率表开销压缩率有限，后续可加入 LZ77 等更强算法。
 4. 同时启用压缩和加密时依赖临时文件，性能和空间效率仍有优化空间。
 5. 当前没有增量备份、版本管理、去重和快照功能。
 
