@@ -70,10 +70,12 @@
 当前已实现：
 - `none`
 - `rle`
+- `huffman`
 
 说明：
 - `rle` 是最基础的游程编码实现，主要用于打通可扩展压缩接口
-- 它不是高压缩率算法，更多是原型阶段的结构验证
+- `huffman` 是标准霍夫曼编码实现，基于字节频率统计构建最优前缀码，对文本类数据有较好的压缩效果
+- `none` 为空操作，不进行压缩
 
 ### 2.5 加密 / 解密
 
@@ -130,6 +132,7 @@ backup_system/
 │   │   ├── codec_registry.hpp
 │   │   ├── filter_registry.hpp
 │   │   ├── filter_spec_builder.hpp
+│   │   ├── huffman_codec.hpp
 │   │   ├── iarchive_strategy.hpp
 │   │   ├── ifile_filter.hpp
 │   │   └── istream_processor.hpp
@@ -148,6 +151,7 @@ backup_system/
     │   ├── file_filter.cpp
     │   ├── filter_registry.cpp
     │   ├── filter_spec_builder.cpp
+    │   ├── huffman_codec.cpp
     │   └── stream_processor.cpp
     └── utils/
         ├── logger.cpp
@@ -298,6 +302,7 @@ backup_system/
 - compression:
   - `none`
   - `rle`
+  - `huffman`
 - encryption:
   - `none`
   - `xor-stream`
@@ -430,8 +435,7 @@ backup_system/
 
 ### 6.4 先做“可扩展正确架构”，再叠加更多算法
 
-当前的 `rle` 和 `xor-stream` 都不是终局算法，但接口已经稳定。
-后续替换更强算法时，基本不需要碰引擎主流程。
+当前的 `none` 只是空操作，`rle` 和 `xor-stream` 是原型算法，`huffman` 是正式压缩实现。接口已经稳定，后续替换更强算法时，基本不需要碰引擎主流程。
 
 ---
 
@@ -490,7 +494,7 @@ cmake --build .
 | `--mode` | `backup` 或 `restore` |
 | `--src` | 备份时为源目录；还原时为归档文件 |
 | `--dest` | 备份时为归档文件；还原时为目标目录 |
-| `--compression` | 压缩算法，当前支持 `none` / `rle` |
+| `--compression` | 压缩算法，当前支持 `none` / `rle` / `huffman` |
 | `--encryption` | 加密算法，当前支持 `none` / `xor-stream` |
 | `--password` | 当启用加密时必须提供 |
 
@@ -539,7 +543,27 @@ cmake --build .
   --compression rle
 ```
 
-### 9.4 使用 XOR 流加密
+### 9.4 使用 Huffman 压缩
+
+```bash
+./build/backup_cli \
+  --mode backup \
+  --src ./data \
+  --dest ./backup_huffman.bks \
+  --compression huffman
+```
+
+还原：
+
+```bash
+./build/backup_cli \
+  --mode restore \
+  --src ./backup_huffman.bks \
+  --dest ./restore_huffman \
+  --compression huffman
+```
+
+### 9.5 使用 XOR 流加密
 
 ```bash
 ./build/backup_cli \
@@ -561,7 +585,7 @@ cmake --build .
   --password secret123
 ```
 
-### 9.5 同时启用压缩和加密
+### 9.6 同时启用压缩和加密
 
 ```bash
 ./build/backup_cli \
@@ -585,7 +609,7 @@ cmake --build .
   --password secret123
 ```
 
-### 9.6 路径过滤
+### 9.7 路径过滤
 
 只备份 `docs/` 目录下文件：
 
@@ -597,7 +621,7 @@ cmake --build .
   --include-path "docs/*"
 ```
 
-### 9.7 文件名过滤
+### 9.8 文件名过滤
 
 只备份日志文件：
 
@@ -609,7 +633,7 @@ cmake --build .
   --include-name "*.log"
 ```
 
-### 9.8 尺寸过滤
+### 9.9 尺寸过滤
 
 只备份大小在 1KB 到 1MB 之间的文件：
 
@@ -622,7 +646,7 @@ cmake --build .
   --max-size 1048576
 ```
 
-### 9.9 时间过滤
+### 9.10 时间过滤
 
 只备份 2025 年 1 月 1 日之后修改的文件：
 
@@ -634,7 +658,7 @@ cmake --build .
   --modified-after 2025-01-01T00:00:00
 ```
 
-### 9.10 多条件组合过滤
+### 9.11 多条件组合过滤
 
 只备份：
 - 位于 `docs/` 下
@@ -700,7 +724,28 @@ cmake --build .
 
 这样可以降低还原到目标目录之外的风险。
 
-### 11.3 临时文件
+### 11.3 Huffman 压缩实现
+
+HuffmanCompressionCodec 是标准霍夫曼编码的完整实现：
+
+1. **频率统计**：第一遍扫描输入数据，统计每个字节的出现次数。
+2. **霍夫曼树构建**：使用优先队列（最小堆）按频率贪心合并节点，\
+   生成最优前缀编码树。
+3. **编码表生成**：DFS 遍历霍夫曼树，为每个叶子节点（字节值）\
+   生成变长比特编码。
+4. **编码输出**：第二遍扫描数据，用 BitWriter 按 MSB-first 顺序\
+   逐比特写入编码位流。
+
+归档格式：
+- 8 字节原始大小 + 256×8 字节频率表 + 变长比特流
+
+特殊处理：
+- 空输入：写入 header 后直接返回，不解码。
+- 单字节输入：不写比特流，解码时直接重复输出该字节。
+- 编码/解码完全无状态，可重复调用。
+
+
+### 11.4 临时文件
 
 当同时启用压缩和加密时，当前 `PipelineStreamProcessor` 使用临时文件串联两个阶段：
 - 先压缩到临时文件
@@ -718,10 +763,12 @@ cmake --build .
 
 ### 12.1 新增压缩算法
 
-步骤：
+步骤（参考 `huffman_codec` 的实现）：
 
-1. 新建一个实现 `ICompressionCodec` 的类
-2. 在 [src/strategy/codec_registry.cpp](/data/users/pennxue/backup_system/src/strategy/codec_registry.cpp) 注册
+1. 新建头文件 [include/strategy/xxx_codec.hpp](include/strategy/) 声明类
+2. 新建源文件 [src/strategy/xxx_codec.cpp](src/strategy/) 实现 `ICompressionCodec` 接口
+3. 在 [src/strategy/codec_registry.cpp](src/strategy/codec_registry.cpp) 的 `compression_registry()` 中注册算法名和工厂
+4. 在 [CMakeLists.txt](CMakeLists.txt) 中加入新源文件
 
 ### 12.2 新增加密算法
 
@@ -756,7 +803,7 @@ cmake --build .
 
 1. 仅支持普通文件和目录，不支持符号链接、设备文件、FIFO 等特殊文件。
 2. 当前加密算法 `xor-stream` 仅为原型实现，不具备强安全性。
-3. 当前压缩算法 `rle` 仅为原型实现，压缩效果有限。
+3. 当前压缩算法 `rle` 压缩效果有限，`huffman` 对高熵数据压缩率有限，后续可加入 LZ77 等更强算法。
 4. 同时启用压缩和加密时依赖临时文件，性能和空间效率仍有优化空间。
 5. 当前没有增量备份、版本管理、去重和快照功能。
 
