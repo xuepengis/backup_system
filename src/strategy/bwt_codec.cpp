@@ -58,7 +58,73 @@ std::vector<std::uint8_t> mtf_decode(const std::vector<std::uint8_t>& data) {
 }
 
 // =========================================================================
-// BWT forward transform
+// Suffix array construction — prefix doubling, O(n log² n)
+//
+// Builds the suffix array for string s: sa[i] is the starting position
+// of the i-th smallest suffix.  After at most log₂n rounds the ranks are
+// all distinct and the array is fully sorted.
+// =========================================================================
+
+std::vector<int> build_sa(const std::vector<std::uint8_t>& s) {
+    const int n = static_cast<int>(s.size());
+    std::vector<int> sa(n);
+    std::vector<int> rank(n);
+    std::vector<int> tmp(n);
+
+    // Round 0: sort by the first character only
+    std::iota(sa.begin(), sa.end(), 0);
+    std::sort(sa.begin(), sa.end(),
+              [&](int a, int b) { return s[a] < s[b]; });
+
+    rank[sa[0]] = 0;
+    for (int i = 1; i < n; ++i) {
+        rank[sa[i]] = rank[sa[i - 1]];
+        if (s[sa[i]] != s[sa[i - 1]]) {
+            ++rank[sa[i]];
+        }
+    }
+
+    // Doubling rounds: sort by (rank[i], rank[i+k])
+    for (int k = 1; k < n; k *= 2) {
+        auto cmp = [&](int a, int b) {
+            if (rank[a] != rank[b]) {
+                return rank[a] < rank[b];
+            }
+            int ra = (a + k < n) ? rank[a + k] : -1;
+            int rb = (b + k < n) ? rank[b + k] : -1;
+            return ra < rb;
+        };
+
+        std::sort(sa.begin(), sa.end(), cmp);
+
+        tmp[sa[0]] = 0;
+        for (int i = 1; i < n; ++i) {
+            tmp[sa[i]] = tmp[sa[i - 1]];
+            if (cmp(sa[i - 1], sa[i])) {
+                ++tmp[sa[i]];
+            }
+        }
+        rank.swap(tmp);
+
+        // All ranks distinct → fully sorted, early exit
+        if (rank[sa[n - 1]] == n - 1) {
+            break;
+        }
+    }
+
+    return sa;
+}
+
+// =========================================================================
+// BWT forward transform via suffix array
+//
+// 1. Double the input:  S2 = data + data  (so every rotation is a prefix
+//    of some suffix of S2).
+// 2. Build the suffix array of S2.
+// 3. Walk the SA: for each suffix starting in the first half (sa[i] < n),
+//    emit the last column byte  data[(sa[i] + n - 1) % n].
+//
+// Complexity: O(n log² n) dominated by build_sa.
 // =========================================================================
 
 std::vector<std::uint8_t> bwt_forward(const std::vector<std::uint8_t>& data,
@@ -69,28 +135,30 @@ std::vector<std::uint8_t> bwt_forward(const std::vector<std::uint8_t>& data,
         return {};
     }
 
-    std::vector<int> rotations(n);
-    std::iota(rotations.begin(), rotations.end(), 0);
+    // Doubled string so rotations are ordinary suffixes
+    std::vector<std::uint8_t> s2;
+    s2.reserve(static_cast<std::size_t>(2 * n));
+    s2.insert(s2.end(), data.begin(), data.end());
+    s2.insert(s2.end(), data.begin(), data.end());
 
-    std::sort(rotations.begin(), rotations.end(),
-              [&](int a, int b) {
-                  for (int i = 0; i < n; ++i) {
-                      std::uint8_t ba = data[(a + i) % n];
-                      std::uint8_t bb = data[(b + i) % n];
-                      if (ba != bb) return ba < bb;
-                  }
-                  return false;
-              });
+    auto sa = build_sa(s2);
 
-    primary_index = 0;
     std::vector<std::uint8_t> result;
-    result.reserve(n);
+    result.reserve(static_cast<std::size_t>(n));
+    primary_index = 0;
 
-    for (int i = 0; i < n; ++i) {
-        int r = rotations[i];
-        result.push_back(data[(r - 1 + n) % n]);
-        if (r == 0) primary_index = i;
+    int bwt_pos = 0;
+    for (int i = 0; i < 2 * n; ++i) {
+        if (sa[i] < n) {
+            if (sa[i] == 0) {
+                primary_index = bwt_pos;
+            }
+            result.push_back(
+                s2[static_cast<std::size_t>(sa[i] + n - 1)]);
+            ++bwt_pos;
+        }
     }
+
     return result;
 }
 
