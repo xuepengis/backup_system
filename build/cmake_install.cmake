@@ -1,4 +1,4 @@
-# Install script for directory: /data/users/pennxue/backup_system
+# Install script for directory: /home/ramedess/backup_system_classmate
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/data/users/pennxue/backup_system/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ramedess/backup_system_classmate/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

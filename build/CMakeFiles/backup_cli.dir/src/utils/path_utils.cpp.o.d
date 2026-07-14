@@ -1,7 +1,7 @@
 CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o: \
- /data/users/pennxue/backup_system/src/utils/path_utils.cpp \
+ /home/ramedess/backup_system_classmate/src/utils/path_utils.cpp \
  /usr/include/stdc-predef.h \
- /data/users/pennxue/backup_system/include/utils/path_utils.hpp \
+ /home/ramedess/backup_system_classmate/include/utils/path_utils.hpp \
  /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
  /usr/include/c++/11/system_error \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \

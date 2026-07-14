@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /data/users/pennxue/backup_system
+CMAKE_SOURCE_DIR = /home/ramedess/backup_system_classmate
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /data/users/pennxue/backup_system/build
+CMAKE_BINARY_DIR = /home/ramedess/backup_system_classmate/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /data/users/pennxue/backup_system/build/CMakeFiles /data/users/pennxue/backup_system/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramedess/backup_system_classmate/build/CMakeFiles /home/ramedess/backup_system_classmate/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /data/users/pennxue/backup_system/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramedess/backup_system_classmate/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -201,6 +201,30 @@ src/core/backup_engine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.s
 .PHONY : src/core/backup_engine.cpp.s
 
+src/strategy/aes_gcm_codec.o: src/strategy/aes_gcm_codec.cpp.o
+.PHONY : src/strategy/aes_gcm_codec.o
+
+# target to build an object file
+src/strategy/aes_gcm_codec.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/aes_gcm_codec.cpp.o
+.PHONY : src/strategy/aes_gcm_codec.cpp.o
+
+src/strategy/aes_gcm_codec.i: src/strategy/aes_gcm_codec.cpp.i
+.PHONY : src/strategy/aes_gcm_codec.i
+
+# target to preprocess a source file
+src/strategy/aes_gcm_codec.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/aes_gcm_codec.cpp.i
+.PHONY : src/strategy/aes_gcm_codec.cpp.i
+
+src/strategy/aes_gcm_codec.s: src/strategy/aes_gcm_codec.cpp.s
+.PHONY : src/strategy/aes_gcm_codec.s
+
+# target to generate assembly for a file
+src/strategy/aes_gcm_codec.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/aes_gcm_codec.cpp.s
+.PHONY : src/strategy/aes_gcm_codec.cpp.s
+
 src/strategy/archive_strategy.o: src/strategy/archive_strategy.cpp.o
 .PHONY : src/strategy/archive_strategy.o
 
@@ -224,6 +248,54 @@ src/strategy/archive_strategy.s: src/strategy/archive_strategy.cpp.s
 src/strategy/archive_strategy.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.s
 .PHONY : src/strategy/archive_strategy.cpp.s
+
+src/strategy/bwt_codec.o: src/strategy/bwt_codec.cpp.o
+.PHONY : src/strategy/bwt_codec.o
+
+# target to build an object file
+src/strategy/bwt_codec.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/bwt_codec.cpp.o
+.PHONY : src/strategy/bwt_codec.cpp.o
+
+src/strategy/bwt_codec.i: src/strategy/bwt_codec.cpp.i
+.PHONY : src/strategy/bwt_codec.i
+
+# target to preprocess a source file
+src/strategy/bwt_codec.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/bwt_codec.cpp.i
+.PHONY : src/strategy/bwt_codec.cpp.i
+
+src/strategy/bwt_codec.s: src/strategy/bwt_codec.cpp.s
+.PHONY : src/strategy/bwt_codec.s
+
+# target to generate assembly for a file
+src/strategy/bwt_codec.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/bwt_codec.cpp.s
+.PHONY : src/strategy/bwt_codec.cpp.s
+
+src/strategy/chacha20_poly1305_codec.o: src/strategy/chacha20_poly1305_codec.cpp.o
+.PHONY : src/strategy/chacha20_poly1305_codec.o
+
+# target to build an object file
+src/strategy/chacha20_poly1305_codec.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.o
+.PHONY : src/strategy/chacha20_poly1305_codec.cpp.o
+
+src/strategy/chacha20_poly1305_codec.i: src/strategy/chacha20_poly1305_codec.cpp.i
+.PHONY : src/strategy/chacha20_poly1305_codec.i
+
+# target to preprocess a source file
+src/strategy/chacha20_poly1305_codec.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.i
+.PHONY : src/strategy/chacha20_poly1305_codec.cpp.i
+
+src/strategy/chacha20_poly1305_codec.s: src/strategy/chacha20_poly1305_codec.cpp.s
+.PHONY : src/strategy/chacha20_poly1305_codec.s
+
+# target to generate assembly for a file
+src/strategy/chacha20_poly1305_codec.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.s
+.PHONY : src/strategy/chacha20_poly1305_codec.cpp.s
 
 src/strategy/codec_registry.o: src/strategy/codec_registry.cpp.o
 .PHONY : src/strategy/codec_registry.o
@@ -321,6 +393,54 @@ src/strategy/filter_spec_builder.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/filter_spec_builder.cpp.s
 .PHONY : src/strategy/filter_spec_builder.cpp.s
 
+src/strategy/huffman_codec.o: src/strategy/huffman_codec.cpp.o
+.PHONY : src/strategy/huffman_codec.o
+
+# target to build an object file
+src/strategy/huffman_codec.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/huffman_codec.cpp.o
+.PHONY : src/strategy/huffman_codec.cpp.o
+
+src/strategy/huffman_codec.i: src/strategy/huffman_codec.cpp.i
+.PHONY : src/strategy/huffman_codec.i
+
+# target to preprocess a source file
+src/strategy/huffman_codec.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/huffman_codec.cpp.i
+.PHONY : src/strategy/huffman_codec.cpp.i
+
+src/strategy/huffman_codec.s: src/strategy/huffman_codec.cpp.s
+.PHONY : src/strategy/huffman_codec.s
+
+# target to generate assembly for a file
+src/strategy/huffman_codec.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/huffman_codec.cpp.s
+.PHONY : src/strategy/huffman_codec.cpp.s
+
+src/strategy/lz77_codec.o: src/strategy/lz77_codec.cpp.o
+.PHONY : src/strategy/lz77_codec.o
+
+# target to build an object file
+src/strategy/lz77_codec.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/lz77_codec.cpp.o
+.PHONY : src/strategy/lz77_codec.cpp.o
+
+src/strategy/lz77_codec.i: src/strategy/lz77_codec.cpp.i
+.PHONY : src/strategy/lz77_codec.i
+
+# target to preprocess a source file
+src/strategy/lz77_codec.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/lz77_codec.cpp.i
+.PHONY : src/strategy/lz77_codec.cpp.i
+
+src/strategy/lz77_codec.s: src/strategy/lz77_codec.cpp.s
+.PHONY : src/strategy/lz77_codec.s
+
+# target to generate assembly for a file
+src/strategy/lz77_codec.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/lz77_codec.cpp.s
+.PHONY : src/strategy/lz77_codec.cpp.s
+
 src/strategy/stream_processor.o: src/strategy/stream_processor.cpp.o
 .PHONY : src/strategy/stream_processor.o
 
@@ -344,6 +464,30 @@ src/strategy/stream_processor.s: src/strategy/stream_processor.cpp.s
 src/strategy/stream_processor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/stream_processor.cpp.s
 .PHONY : src/strategy/stream_processor.cpp.s
+
+src/utils/huffman_coding.o: src/utils/huffman_coding.cpp.o
+.PHONY : src/utils/huffman_coding.o
+
+# target to build an object file
+src/utils/huffman_coding.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/huffman_coding.cpp.o
+.PHONY : src/utils/huffman_coding.cpp.o
+
+src/utils/huffman_coding.i: src/utils/huffman_coding.cpp.i
+.PHONY : src/utils/huffman_coding.i
+
+# target to preprocess a source file
+src/utils/huffman_coding.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/huffman_coding.cpp.i
+.PHONY : src/utils/huffman_coding.cpp.i
+
+src/utils/huffman_coding.s: src/utils/huffman_coding.cpp.s
+.PHONY : src/utils/huffman_coding.s
+
+# target to generate assembly for a file
+src/utils/huffman_coding.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/utils/huffman_coding.cpp.s
+.PHONY : src/utils/huffman_coding.cpp.s
 
 src/utils/logger.o: src/utils/logger.cpp.o
 .PHONY : src/utils/logger.o
@@ -435,9 +579,18 @@ help:
 	@echo "... src/core/backup_engine.o"
 	@echo "... src/core/backup_engine.i"
 	@echo "... src/core/backup_engine.s"
+	@echo "... src/strategy/aes_gcm_codec.o"
+	@echo "... src/strategy/aes_gcm_codec.i"
+	@echo "... src/strategy/aes_gcm_codec.s"
 	@echo "... src/strategy/archive_strategy.o"
 	@echo "... src/strategy/archive_strategy.i"
 	@echo "... src/strategy/archive_strategy.s"
+	@echo "... src/strategy/bwt_codec.o"
+	@echo "... src/strategy/bwt_codec.i"
+	@echo "... src/strategy/bwt_codec.s"
+	@echo "... src/strategy/chacha20_poly1305_codec.o"
+	@echo "... src/strategy/chacha20_poly1305_codec.i"
+	@echo "... src/strategy/chacha20_poly1305_codec.s"
 	@echo "... src/strategy/codec_registry.o"
 	@echo "... src/strategy/codec_registry.i"
 	@echo "... src/strategy/codec_registry.s"
@@ -450,9 +603,18 @@ help:
 	@echo "... src/strategy/filter_spec_builder.o"
 	@echo "... src/strategy/filter_spec_builder.i"
 	@echo "... src/strategy/filter_spec_builder.s"
+	@echo "... src/strategy/huffman_codec.o"
+	@echo "... src/strategy/huffman_codec.i"
+	@echo "... src/strategy/huffman_codec.s"
+	@echo "... src/strategy/lz77_codec.o"
+	@echo "... src/strategy/lz77_codec.i"
+	@echo "... src/strategy/lz77_codec.s"
 	@echo "... src/strategy/stream_processor.o"
 	@echo "... src/strategy/stream_processor.i"
 	@echo "... src/strategy/stream_processor.s"
+	@echo "... src/utils/huffman_coding.o"
+	@echo "... src/utils/huffman_coding.i"
+	@echo "... src/utils/huffman_coding.s"
 	@echo "... src/utils/logger.o"
 	@echo "... src/utils/logger.i"
 	@echo "... src/utils/logger.s"

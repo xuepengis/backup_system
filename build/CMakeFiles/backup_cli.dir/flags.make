@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/data/users/pennxue/backup_system/include
+CXX_INCLUDES = -I/home/ramedess/backup_system_classmate/include
 
 CXX_FLAGS = -Wall -Wextra -Wpedantic -std=c++20
 
