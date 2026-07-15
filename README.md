@@ -108,6 +108,26 @@
 - 归档载荷校验
 - 原始内容校验
 
+### 2.7 备份验证
+
+当前已实现：
+
+- `--mode verify` 读取已有归档文件，逐条验证每条记录的完整性和内容正确性
+- 验证时自动识别归档头 flags 中记录的校验算法（FNV-1a 或 CRC-32）
+- 校验包括：归档载荷校验（存储完整性）和原始内容校验（还原正确性）
+- 错误的密码、损坏的数据、被篡改的归档均会被检测并报告具体失败文件
+- 验证模式不向磁盘写入任何文件，仅读取解码到内存校验
+
+### 2.8 CRC-32 校验算法
+
+当前已实现两种校验算法：
+
+- `fnv1a`（默认）：FNV-1a 64 位 hash，轻量快速
+- `crc32`：IEEE 802.3 CRC-32（与 ZIP/gzip/PNG 同款），纯 C++20 `constexpr` 编译期表驱动实现，零运行时开销，无任何外部依赖
+
+使用 `--checksum crc32` 在备份时启用 CRC-32。还原和验证时算法从归档头 flags 自动检测，
+无需用户手动指定。
+
 ---
 
 ## 3. 当前未实现或仅部分实现的内容
@@ -142,6 +162,7 @@ backup_system/
 │   │   ├── bwt_codec.hpp
 │   │   ├── chacha20_poly1305_codec.hpp
 │   │   ├── codec_registry.hpp
+│   │   ├── ichecksum_engine.hpp
 │   │   ├── filter_registry.hpp
 │   │   ├── filter_spec_builder.hpp
 │   │   ├── huffman_codec.hpp
@@ -521,12 +542,13 @@ cmake --build .
 
 | 参数 | 说明 |
 |---|---|
-| `--mode` | `backup` 或 `restore` |
-| `--src` | 备份时为源目录；还原时为归档文件 |
-| `--dest` | 备份时为归档文件；还原时为目标目录 |
+| `--mode` | `backup`、`restore` 或 `verify` |
+| `--src` | 备份时为源目录；还原/验证时为归档文件 |
+| `--dest` | 备份时为归档文件；还原时为目标目录（验证模式不需要） |
 | `--compression` | 压缩算法，当前支持 `none` / `rle` / `huffman` / `lz77` / `bwt` |
-| `--encryption` | 加密算法，当前支持 `none` / `xor-stream` |
+| `--encryption` | 加密算法，当前支持 `none` / `xor-stream` / `aes-256-gcm` / `chacha20-poly1305` |
 | `--password` | 当启用加密时必须提供 |
+| `--checksum` | 校验算法，`fnv1a`（默认）或 `crc32`。仅在 backup 模式下生效；restore/verify 时自动检测 |
 
 ### 8.3 过滤参数
 
@@ -793,6 +815,67 @@ cmake --build .
   --modified-after 2025-01-01T00:00:00
 ```
 
+### 9.16 使用 CRC-32 校验算法
+
+```bash
+./build/backup_cli \
+  --mode backup \
+  --src ./data \
+  --dest ./crc32_backup.bks \
+  --checksum crc32
+```
+
+还原时自动检测，无需指定 `--checksum`：
+
+```bash
+./build/backup_cli \
+  --mode restore \
+  --src ./crc32_backup.bks \
+  --dest ./restore_out
+```
+
+### 9.17 验证备份文件完整性
+
+不还原到磁盘，仅验证归档文件中每条记录的完整性：
+
+```bash
+./build/backup_cli \
+  --mode verify \
+  --src ./backup.bks
+```
+
+验证加密归档：
+
+```bash
+./build/backup_cli \
+  --mode verify \
+  --src ./encrypted_backup.bks \
+  --compression huffman \
+  --encryption aes-256-gcm \
+  --password secret123
+```
+
+输出示例：
+
+```
+[INFO] verifying archive: ./encrypted_backup.bks
+[INFO] [DIR]  .
+[INFO] [DIR]  subdir
+[INFO] [PASS] subdir/file3.txt
+[INFO] [PASS] file1.txt
+[INFO] [PASS] file2.txt
+[INFO] verification summary: 3 passed, 0 failed, 3 total
+Verification completed successfully.
+```
+
+密码错误时的输出示例：
+
+```
+[ERROR] [FAIL] file1.txt: aes-gcm decryption failed: authentication tag mismatch (wrong password or corrupted data)
+[INFO] verification summary: 0 passed, 3 failed, 3 total
+Error: archive verification failed: 3 file(s) did not pass verification
+```
+
 ---
 
 ## 10. 常见行为说明
@@ -812,7 +895,19 @@ cmake --build .
 
 当前通常会在恢复阶段触发内容 checksum 不匹配，从而失败。
 
-### 10.3 为什么目录默认不过滤掉？
+### 10.3 为什么 restore / verify 时不需要指定 --checksum？
+
+因为校验算法类型已编码在归档文件的 flags 字段中：
+- flags bit 0 = 0 → FNV-1a
+- flags bit 0 = 1 → CRC-32
+
+reader 在打开归档时会自动读取 flags 并选择对应的校验引擎，
+因此还原和验证时无需用户手动指定。
+
+如果用户在 restore/verify 时仍然指定了 `--checksum` 且与归档内
+记录的不一致，系统会输出一条 warning 并忽略用户指定的值。
+
+### 10.4 为什么目录默认不过滤掉？
 
 因为目录如果被提前剪枝，可能导致其子文件永远不会被遍历，从而漏备份。
 所以当前策略是：
@@ -918,7 +1013,18 @@ AesGcmEncryptionCodec 是基于 OpenSSL EVP 的 AES-256-GCM 认证加密实现�
 - 随机盐值 + 随机 IV：相同密码加密相同数据，每次产生完全不同的密文。
 - AES-NI 硬件加速：现代 CPU 上加密/解密速度极快。
 
-### 11.8 ChaCha20-Poly1305 加密实现
+### 11.8 CRC-32 校验实现
+
+`Crc32ChecksumEngine` 是 IEEE 802.3 CRC-32 的完整纯 C++ 实现：
+
+1. **多项式**：`0xEDB88320`（反射形式），与 ZIP、gzip、PNG 等标准一致。
+2. **查找表**：`constexpr` 编译期生成 256 条目查找表，零运行时开销。
+3. **计算**：`crc = (crc >> 8) ^ table[(crc ^ byte) & 0xFF]` 逐字节更新。
+4. **返回值**：实际 32 位校验值（计算前初始值 `0xFFFFFFFF`，完成后异或 `0xFFFFFFFF`）零扩展到 64 位，与现有 `uint64_t checksum` 字段兼容。
+
+无任何外部依赖，完全遵循项目核心原则。
+
+### 11.9 ChaCha20-Poly1305 加密实现
 
 ChaCha20Poly1305EncryptionCodec 是基于 OpenSSL EVP 的 ChaCha20-Poly1305 认证加密实现：
 

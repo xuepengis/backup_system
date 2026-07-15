@@ -7,6 +7,7 @@
 #include <ostream>
 #include <string>
 
+#include "strategy/ichecksum_engine.hpp"
 #include "strategy/istream_processor.hpp"
 #include "utils/metadata_utils.hpp"
 
@@ -49,6 +50,14 @@ public:
     virtual ArchiveEntry read_next_entry() = 0;
     virtual std::istream& current_file_stream() = 0;
     virtual void finish_file() = 0;
+
+    /// Skip the current file payload without validating its checksum.
+    /// Used for error recovery in verify mode.
+    virtual void skip_current_file() = 0;
+
+    /// Return the checksum engine that was auto-detected from the archive header.
+    [[nodiscard]] virtual const IChecksumEngine& checksum_engine() const = 0;
+
     virtual void finish() = 0;
 };
 
@@ -63,7 +72,8 @@ public:
 
 class BinaryArchiveStrategy final : public IArchiveStrategy {
 public:
-    explicit BinaryArchiveStrategy(PayloadCodecDescriptor descriptor);
+    BinaryArchiveStrategy(PayloadCodecDescriptor descriptor,
+                          std::shared_ptr<IChecksumEngine> checksum_engine);
 
     std::unique_ptr<IArchiveWriter> create_writer(const std::filesystem::path& archive_path) const override;
     std::unique_ptr<IArchiveReader> create_reader(const std::filesystem::path& archive_path) const override;
@@ -71,6 +81,7 @@ public:
 
 private:
     PayloadCodecDescriptor descriptor_;
+    std::shared_ptr<IChecksumEngine> checksum_engine_;
 };
 
 }  // namespace backup_system::strategy

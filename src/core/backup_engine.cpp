@@ -18,40 +18,70 @@ std::string describe_path(const std::filesystem::path& path) {
     return path.string();
 }
 
-std::uint64_t compute_file_checksum(const std::filesystem::path& path) {
-    constexpr std::uint64_t kFnvOffsetBasis = 14695981039346656037ULL;
-    constexpr std::uint64_t kFnvPrime = 1099511628211ULL;
-
-    std::ifstream input(path, std::ios::binary);
-    if (!input) {
-        throw std::runtime_error("failed to open file for checksum: " + path.string());
+// ---------------------------------------------------------------------------
+// ChecksumSinkStream — an ostream that discards all data while computing a
+// checksum via the provided engine.  Used by verify mode to validate content
+// without writing restored files to disk.
+// ---------------------------------------------------------------------------
+class ChecksumSinkBuffer final : public std::streambuf {
+public:
+    explicit ChecksumSinkBuffer(const strategy::IChecksumEngine& engine)
+        : engine_(engine),
+          state_(engine_.initial_value()) {
     }
 
-    std::uint64_t hash = kFnvOffsetBasis;
-    std::array<char, 64 * 1024> buffer {};
-    while (input) {
-        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
-        const auto bytes_read = input.gcount();
-        for (std::streamsize index = 0; index < bytes_read; ++index) {
-            hash ^= static_cast<unsigned char>(buffer[static_cast<std::size_t>(index)]);
-            hash *= kFnvPrime;
+    std::uint64_t checksum() const {
+        return engine_.finalize(state_);
+    }
+
+protected:
+    int_type overflow(const int_type value) override {
+        if (traits_type::eq_int_type(value, traits_type::eof())) {
+            return traits_type::not_eof(value);
         }
+        const char byte = traits_type::to_char_type(value);
+        engine_.update(state_, &byte, 1);
+        return value;
     }
 
-    if (!input.eof()) {
-        throw std::runtime_error("failed while computing checksum for: " + path.string());
+    std::streamsize xsputn(const char* source, std::streamsize count) override {
+        if (count > 0) {
+            engine_.update(state_, source, static_cast<std::size_t>(count));
+        }
+        return count;
     }
-    return hash;
-}
+
+private:
+    const strategy::IChecksumEngine& engine_;
+    std::uint64_t state_;
+};
+
+class ChecksumSinkStream final : public std::ostream {
+public:
+    explicit ChecksumSinkStream(const strategy::IChecksumEngine& engine)
+        : std::ostream(nullptr),
+          buffer_(engine) {
+        rdbuf(&buffer_);
+    }
+
+    std::uint64_t checksum() const {
+        return buffer_.checksum();
+    }
+
+private:
+    ChecksumSinkBuffer buffer_;
+};
 
 }  // namespace
 
 BackupEngine::BackupEngine(std::shared_ptr<strategy::IFileFilter> filter,
                            std::shared_ptr<strategy::IStreamProcessor> stream_processor,
-                           std::shared_ptr<strategy::IArchiveStrategy> archive_strategy)
+                           std::shared_ptr<strategy::IArchiveStrategy> archive_strategy,
+                           std::shared_ptr<strategy::IChecksumEngine> checksum_engine)
     : filter_(std::move(filter)),
       stream_processor_(std::move(stream_processor)),
-      archive_strategy_(std::move(archive_strategy)) {
+      archive_strategy_(std::move(archive_strategy)),
+      checksum_engine_(std::move(checksum_engine)) {
     if (!filter_) {
         throw std::invalid_argument("file filter must not be null");
     }
@@ -60,6 +90,9 @@ BackupEngine::BackupEngine(std::shared_ptr<strategy::IFileFilter> filter,
     }
     if (!archive_strategy_) {
         throw std::invalid_argument("archive strategy must not be null");
+    }
+    if (!checksum_engine_) {
+        throw std::invalid_argument("checksum engine must not be null");
     }
 }
 
@@ -169,7 +202,7 @@ void BackupEngine::backup_regular_file(const std::filesystem::path& source_path,
     }
 
     const auto original_size = static_cast<std::uint64_t>(std::filesystem::file_size(source_path));
-    const auto content_checksum = compute_file_checksum(source_path);
+    const auto content_checksum = checksum_engine_->compute_file(source_path);
     auto& archive_output = archive_writer.begin_file(
         relative_path,
         original_size,
@@ -214,11 +247,93 @@ void BackupEngine::restore_regular_file(const strategy::ArchiveEntry& entry,
     if (restored_size != entry.original_size) {
         throw std::runtime_error("restored file size does not match archive metadata for: " + target_path.string());
     }
-    if (compute_file_checksum(target_path) != entry.content_checksum) {
+    if (checksum_engine_->compute_file(target_path) != entry.content_checksum) {
         throw std::runtime_error("restored file checksum does not match archive metadata for: " + target_path.string());
     }
 
     utils::MetadataUtils::apply(target_path, entry.metadata);
+}
+
+void BackupEngine::validate_verify_options(const VerifyOptions& options) const {
+    if (options.archive_path.empty()) {
+        throw std::invalid_argument("archive path must not be empty");
+    }
+    if (!std::filesystem::exists(options.archive_path)) {
+        throw std::runtime_error("archive path does not exist: " + options.archive_path.string());
+    }
+    if (!std::filesystem::is_regular_file(options.archive_path)) {
+        throw std::runtime_error("archive path is not a regular file: " + options.archive_path.string());
+    }
+}
+
+void BackupEngine::verify(const VerifyOptions& options) const {
+    validate_verify_options(options);
+
+    auto archive_reader = archive_strategy_->create_reader(options.archive_path);
+    utils::Logger::info("verifying archive: " + describe_path(options.archive_path));
+
+    // The reader auto-detected the checksum engine from the archive flags.
+    // Use it for content verification so we match the algorithm that wrote the archive.
+    std::uint64_t passed = 0;
+    std::uint64_t failed = 0;
+    std::uint64_t total = 0;
+
+    while (true) {
+        const auto entry = archive_reader->read_next_entry();
+        if (entry.type == strategy::ArchiveEntryType::end_of_archive) {
+            break;
+        }
+        if (entry.type == strategy::ArchiveEntryType::directory) {
+            utils::Logger::info("[DIR]  " + entry.relative_path.string());
+            continue;
+        }
+        if (entry.type == strategy::ArchiveEntryType::regular_file) {
+            ++total;
+            if (verify_regular_file(entry, *archive_reader)) {
+                ++passed;
+            } else {
+                ++failed;
+            }
+            continue;
+        }
+
+        throw std::runtime_error("unsupported archive entry type");
+    }
+
+    archive_reader->finish();
+
+    utils::Logger::info("verification summary: " + std::to_string(passed) + " passed, " +
+                        std::to_string(failed) + " failed, " + std::to_string(total) + " total");
+    if (failed > 0) {
+        throw std::runtime_error("archive verification failed: " + std::to_string(failed) +
+                                 " file(s) did not pass verification");
+    }
+}
+
+bool BackupEngine::verify_regular_file(const strategy::ArchiveEntry& entry,
+                                        strategy::IArchiveReader& archive_reader) const {
+    const auto file_label = entry.relative_path.string();
+
+    try {
+        auto& input = archive_reader.current_file_stream();
+        ChecksumSinkStream sink(archive_reader.checksum_engine());
+        stream_processor_->restore(input, sink, entry.relative_path);
+        archive_reader.finish_file();
+
+        if (sink.checksum() != entry.content_checksum) {
+            utils::Logger::error("[FAIL] " + file_label + ": content checksum mismatch "
+                                 "(expected=" + std::to_string(entry.content_checksum) +
+                                 ", actual=" + std::to_string(sink.checksum()) + ")");
+            return false;
+        }
+
+        utils::Logger::info("[PASS] " + file_label);
+        return true;
+    } catch (const std::exception& ex) {
+        utils::Logger::error("[FAIL] " + file_label + ": " + ex.what());
+        archive_reader.skip_current_file();
+        return false;
+    }
 }
 
 void BackupEngine::apply_deferred_directory_metadata(

@@ -25,11 +25,16 @@ std::string join_options(const std::vector<std::string>& values) {
 }
 
 void validate_options(const CliOptions& options) {
-    if (options.mode.empty() || options.source.empty() || options.destination.empty()) {
-        throw std::invalid_argument("mode, src and dest arguments are required");
+    if (options.mode.empty() || options.source.empty()) {
+        throw std::invalid_argument("mode and src arguments are required");
     }
-    if (options.mode != "backup" && options.mode != "restore") {
-        throw std::invalid_argument("mode must be either backup or restore");
+    if (options.mode != "backup" && options.mode != "restore" && options.mode != "verify") {
+        throw std::invalid_argument("mode must be backup, restore, or verify");
+    }
+    if (options.mode == "backup" || options.mode == "restore") {
+        if (options.destination.empty()) {
+            throw std::invalid_argument("dest argument is required for backup and restore modes");
+        }
     }
     if (options.encryption == "none" && !options.password.empty()) {
         throw std::invalid_argument("password was provided but encryption is disabled");
@@ -71,6 +76,8 @@ CliOptions CliParser::parse(int argc, char* argv[]) {
             options.encryption = require_value(arg);
         } else if (arg == "--password") {
             options.password = require_value(arg);
+        } else if (arg == "--checksum") {
+            options.checksum = require_value(arg);
         } else if (arg == "--include-path") {
             options.filter_config.include_paths.push_back(require_value(arg));
         } else if (arg == "--include-name") {
@@ -97,6 +104,7 @@ CliOptions CliParser::parse(int argc, char* argv[]) {
 std::string CliParser::usage(const std::string_view program_name) {
     const auto compression_options = join_options(strategy::list_compression_codecs());
     const auto encryption_options = join_options(strategy::list_encryption_codecs());
+    const auto checksum_options = join_options(strategy::list_checksum_engines());
 
     std::ostringstream output;
     output
@@ -104,10 +112,14 @@ std::string CliParser::usage(const std::string_view program_name) {
         << "  " << program_name
         << " --mode backup --src <source_dir> --dest <archive_file> [--compression " << compression_options
         << "] [--encryption " << encryption_options << "] [--password <secret>]\n"
-        << "    [--include-path <glob>] [--include-name <glob>] [--min-size <bytes>] [--max-size <bytes>]\n"
+        << "    [--checksum " << checksum_options << "]"
+        << " [--include-path <glob>] [--include-name <glob>] [--min-size <bytes>] [--max-size <bytes>]\n"
         << "    [--modified-after <YYYY-MM-DDTHH:MM:SS>] [--modified-before <YYYY-MM-DDTHH:MM:SS>]\n"
         << "  " << program_name
         << " --mode restore --src <archive_file> --dest <restore_dir> [--compression " << compression_options
+        << "] [--encryption " << encryption_options << "] [--password <secret>]\n"
+        << "  " << program_name
+        << " --mode verify --src <archive_file> [--compression " << compression_options
         << "] [--encryption " << encryption_options << "] [--password <secret>]\n";
     return output.str();
 }

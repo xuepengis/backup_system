@@ -19,6 +19,7 @@ add_executable(backup_cli
     src/strategy/chacha20_poly1305_codec.cpp
     src/strategy/codec_registry.cpp
     src/strategy/bwt_codec.cpp
+    src/strategy/checksum_engine.cpp
     src/utils/huffman_coding.cpp
     src/strategy/file_filter.cpp
     src/strategy/huffman_codec.cpp

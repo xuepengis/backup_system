@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "strategy/iarchive_strategy.hpp"
+#include "strategy/ichecksum_engine.hpp"
 #include "strategy/ifile_filter.hpp"
 #include "strategy/istream_processor.hpp"
 #include "utils/metadata_utils.hpp"
@@ -22,14 +23,20 @@ struct RestoreOptions {
     std::filesystem::path restore_root;
 };
 
+struct VerifyOptions {
+    std::filesystem::path archive_path;
+};
+
 class BackupEngine {
 public:
     BackupEngine(std::shared_ptr<strategy::IFileFilter> filter,
                  std::shared_ptr<strategy::IStreamProcessor> stream_processor,
-                 std::shared_ptr<strategy::IArchiveStrategy> archive_strategy);
+                 std::shared_ptr<strategy::IArchiveStrategy> archive_strategy,
+                 std::shared_ptr<strategy::IChecksumEngine> checksum_engine);
 
     void backup(const BackupOptions& options) const;
     void restore(const RestoreOptions& options) const;
+    void verify(const VerifyOptions& options) const;
 
 private:
     struct DeferredMetadataEntry {
@@ -39,6 +46,7 @@ private:
 
     void validate_backup_options(const BackupOptions& options) const;
     void validate_restore_options(const RestoreOptions& options) const;
+    void validate_verify_options(const VerifyOptions& options) const;
 
     void backup_directory_entry(const std::filesystem::path& source_root,
                                 const std::filesystem::directory_entry& entry,
@@ -56,11 +64,15 @@ private:
                               strategy::IArchiveReader& archive_reader,
                               const std::filesystem::path& restore_root) const;
 
+    bool verify_regular_file(const strategy::ArchiveEntry& entry,
+                             strategy::IArchiveReader& archive_reader) const;
+
     void apply_deferred_directory_metadata(const std::vector<DeferredMetadataEntry>& deferred_metadata) const;
 
     std::shared_ptr<strategy::IFileFilter> filter_;
     std::shared_ptr<strategy::IStreamProcessor> stream_processor_;
     std::shared_ptr<strategy::IArchiveStrategy> archive_strategy_;
+    std::shared_ptr<strategy::IChecksumEngine> checksum_engine_;
 };
 
 }  // namespace backup_system::core

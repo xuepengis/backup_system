@@ -4,6 +4,7 @@
 #include "strategy/bwt_codec.hpp"
 #include "strategy/chacha20_poly1305_codec.hpp"
 #include "strategy/huffman_codec.hpp"
+#include "strategy/ichecksum_engine.hpp"
 #include "strategy/lz77_codec.hpp"
 
 #include <array>

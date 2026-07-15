@@ -8,8 +8,10 @@
 #include "strategy/codec_registry.hpp"
 #include "strategy/filter_registry.hpp"
 #include "strategy/iarchive_strategy.hpp"
+#include "strategy/ichecksum_engine.hpp"
 #include "strategy/ifile_filter.hpp"
 #include "strategy/istream_processor.hpp"
+#include "utils/logger.hpp"
 
 int main(int argc, char* argv[]) {
     try {
@@ -36,9 +38,25 @@ int main(int argc, char* argv[]) {
             compression_codec,
             encryption_codec,
             cli_options.password);
+
+        // Determine the checksum engine.  For restore and verify modes the
+        // archive header takes precedence — detect_checksum_from_archive()
+        // peeks at the header flags so we construct the correct engine up front.
+        std::string checksum_name = cli_options.checksum;
+        if (cli_options.mode == "restore" || cli_options.mode == "verify") {
+            const auto detected = backup_system::strategy::detect_checksum_from_archive(cli_options.source);
+            if (cli_options.checksum != "fnv1a" && cli_options.checksum != detected) {
+                backup_system::utils::Logger::warning(
+                    "archive was created with --checksum " + detected +
+                    "; ignoring --checksum " + cli_options.checksum);
+            }
+            checksum_name = detected;
+        }
+
+        auto checksum_engine = backup_system::strategy::create_checksum_engine(checksum_name);
         auto archive_strategy = std::make_shared<backup_system::strategy::BinaryArchiveStrategy>(
-            processor->descriptor());
-        backup_system::core::BackupEngine engine(filter, processor, archive_strategy);
+            processor->descriptor(), checksum_engine);
+        backup_system::core::BackupEngine engine(filter, processor, archive_strategy, checksum_engine);
 
         if (cli_options.mode == "backup") {
             engine.backup({
@@ -55,6 +73,12 @@ int main(int argc, char* argv[]) {
                 .restore_root = cli_options.destination,
             });
             std::cout << "Restore completed successfully.\n";
+            return 0;
+        }
+
+        if (cli_options.mode == "verify") {
+            engine.verify({.archive_path = cli_options.source});
+            std::cout << "Verification completed successfully.\n";
             return 0;
         }
 

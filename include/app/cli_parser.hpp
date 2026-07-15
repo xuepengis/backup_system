@@ -15,6 +15,7 @@ struct CliOptions {
     std::string compression {"none"};
     std::string encryption {"none"};
     std::string password;
+    std::string checksum {"fnv1a"};
     strategy::FilterCliConfig filter_config;
 };
 
