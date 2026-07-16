@@ -1,3 +1,0 @@
-/home/ramedess/backup_system_classmate/build/CMakeFiles/backup_cli.dir
-/home/ramedess/backup_system_classmate/build/CMakeFiles/edit_cache.dir
-/home/ramedess/backup_system_classmate/build/CMakeFiles/rebuild_cache.dir
