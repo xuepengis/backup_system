@@ -203,7 +203,7 @@ CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o: \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp \
+ /home/ramedess/backup_system_classmate/include/strategy/ichecksum_engine.hpp \
  /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
  /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
  /usr/include/c++/11/limits /usr/include/c++/11/ctime \
@@ -219,6 +219,7 @@ CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o: \
  /usr/include/c++/11/istream /usr/include/c++/11/bits/istream.tcc \
  /usr/include/c++/11/bits/sstream.tcc /usr/include/c++/11/codecvt \
  /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
+ /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/aes_gcm_codec.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/bwt_codec.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/chacha20_poly1305_codec.hpp \

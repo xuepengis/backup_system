@@ -215,6 +215,10 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
  /usr/include/c++/11/bits/uses_allocator_args.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
  /usr/include/c++/11/pstl/execution_defs.h \
+ /home/ramedess/backup_system_classmate/include/strategy/ichecksum_engine.hpp \
+ /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc \
  /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp \
  /home/ramedess/backup_system_classmate/include/utils/metadata_utils.hpp \
  /usr/include/c++/11/cstddef /usr/include/c++/11/fstream \
@@ -236,4 +240,5 @@ CMakeFiles/backup_cli.dir/src/strategy/archive_strategy.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
+ /home/ramedess/backup_system_classmate/include/strategy/codec_registry.hpp \
  /home/ramedess/backup_system_classmate/include/utils/path_utils.hpp

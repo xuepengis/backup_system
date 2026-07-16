@@ -297,6 +297,30 @@ src/strategy/chacha20_poly1305_codec.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.s
 .PHONY : src/strategy/chacha20_poly1305_codec.cpp.s
 
+src/strategy/checksum_engine.o: src/strategy/checksum_engine.cpp.o
+.PHONY : src/strategy/checksum_engine.o
+
+# target to build an object file
+src/strategy/checksum_engine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/checksum_engine.cpp.o
+.PHONY : src/strategy/checksum_engine.cpp.o
+
+src/strategy/checksum_engine.i: src/strategy/checksum_engine.cpp.i
+.PHONY : src/strategy/checksum_engine.i
+
+# target to preprocess a source file
+src/strategy/checksum_engine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/checksum_engine.cpp.i
+.PHONY : src/strategy/checksum_engine.cpp.i
+
+src/strategy/checksum_engine.s: src/strategy/checksum_engine.cpp.s
+.PHONY : src/strategy/checksum_engine.s
+
+# target to generate assembly for a file
+src/strategy/checksum_engine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backup_cli.dir/build.make CMakeFiles/backup_cli.dir/src/strategy/checksum_engine.cpp.s
+.PHONY : src/strategy/checksum_engine.cpp.s
+
 src/strategy/codec_registry.o: src/strategy/codec_registry.cpp.o
 .PHONY : src/strategy/codec_registry.o
 
@@ -591,6 +615,9 @@ help:
 	@echo "... src/strategy/chacha20_poly1305_codec.o"
 	@echo "... src/strategy/chacha20_poly1305_codec.i"
 	@echo "... src/strategy/chacha20_poly1305_codec.s"
+	@echo "... src/strategy/checksum_engine.o"
+	@echo "... src/strategy/checksum_engine.i"
+	@echo "... src/strategy/checksum_engine.s"
 	@echo "... src/strategy/codec_registry.o"
 	@echo "... src/strategy/codec_registry.i"
 	@echo "... src/strategy/codec_registry.s"

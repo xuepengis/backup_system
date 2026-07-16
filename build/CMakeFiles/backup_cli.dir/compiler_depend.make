@@ -282,6 +282,7 @@ CMakeFiles/backup_cli.dir/main.cpp.o: ../main.cpp \
   ../include/strategy/filter_spec_builder.hpp \
   ../include/core/backup_engine.hpp \
   ../include/strategy/iarchive_strategy.hpp \
+  ../include/strategy/ichecksum_engine.hpp \
   ../include/strategy/istream_processor.hpp \
   ../include/utils/metadata_utils.hpp \
   ../include/strategy/codec_registry.hpp
@@ -5389,6 +5390,8 @@ CMakeFiles/backup_cli.dir/src/utils/path_utils.cpp.o: ../src/utils/path_utils.cp
 /usr/include/c++/11/bits/memoryfwd.h:
 
 /usr/include/openssl/core_dispatch.h:
+
+../include/strategy/ichecksum_engine.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 

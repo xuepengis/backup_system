@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/backup_cli.dir/src/strategy/bwt_codec.cpp.o.d"
   "CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.o"
   "CMakeFiles/backup_cli.dir/src/strategy/chacha20_poly1305_codec.cpp.o.d"
+  "CMakeFiles/backup_cli.dir/src/strategy/checksum_engine.cpp.o"
+  "CMakeFiles/backup_cli.dir/src/strategy/checksum_engine.cpp.o.d"
   "CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o"
   "CMakeFiles/backup_cli.dir/src/strategy/codec_registry.cpp.o.d"
   "CMakeFiles/backup_cli.dir/src/strategy/file_filter.cpp.o"

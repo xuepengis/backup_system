@@ -227,4 +227,5 @@ CMakeFiles/backup_cli.dir/src/app/cli_parser.cpp.o: \
  /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
  /home/ramedess/backup_system_classmate/include/strategy/filter_spec_builder.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/codec_registry.hpp \
+ /home/ramedess/backup_system_classmate/include/strategy/ichecksum_engine.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp

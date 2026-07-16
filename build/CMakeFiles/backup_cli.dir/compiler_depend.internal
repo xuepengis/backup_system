@@ -283,6 +283,7 @@ CMakeFiles/backup_cli.dir/main.cpp.o
  /home/ramedess/backup_system_classmate/include/strategy/filter_spec_builder.hpp
  /home/ramedess/backup_system_classmate/include/core/backup_engine.hpp
  /home/ramedess/backup_system_classmate/include/strategy/iarchive_strategy.hpp
+ /home/ramedess/backup_system_classmate/include/strategy/ichecksum_engine.hpp
  /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp
  /home/ramedess/backup_system_classmate/include/utils/metadata_utils.hpp
  /home/ramedess/backup_system_classmate/include/strategy/codec_registry.hpp

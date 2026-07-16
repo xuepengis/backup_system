@@ -219,6 +219,7 @@ CMakeFiles/backup_cli.dir/src/core/backup_engine.cpp.o: \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
  /home/ramedess/backup_system_classmate/include/strategy/iarchive_strategy.hpp \
+ /home/ramedess/backup_system_classmate/include/strategy/ichecksum_engine.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/istream_processor.hpp \
  /home/ramedess/backup_system_classmate/include/utils/metadata_utils.hpp \
  /home/ramedess/backup_system_classmate/include/strategy/ifile_filter.hpp \
