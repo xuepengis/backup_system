@@ -13,6 +13,7 @@ namespace backup_system::utils {
 
 namespace {
 
+// 统一封装系统调用错误，避免异常信息风格分散。
 std::runtime_error make_system_error(const std::string& operation, const std::filesystem::path& path) {
     return std::runtime_error(operation + " failed for " + path.string() + ": " + std::strerror(errno));
 }
@@ -45,6 +46,7 @@ void MetadataUtils::apply(const std::filesystem::path& path, const FileMetadata&
     if (::chown(path.c_str(),
                 static_cast<uid_t>(metadata.owner_uid),
                 static_cast<gid_t>(metadata.owner_gid)) != 0) {
+        // 非特权用户恢复归档时无法改属主属于预期场景，其余错误继续上抛。
         if (errno != EPERM) {
             throw make_system_error("chown", path);
         }

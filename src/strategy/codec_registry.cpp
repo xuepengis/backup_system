@@ -21,6 +21,7 @@ namespace backup_system::strategy {
 
 namespace {
 
+// 编解码注册表集中维护默认实现，便于 CLI 和核心流程按名称装配。
 using CompressionFactory = std::function<std::shared_ptr<ICompressionCodec>()>;
 using EncryptionFactory = std::function<std::shared_ptr<IEncryptionCodec>()>;
 
@@ -54,6 +55,7 @@ void copy_stream(std::istream& input, std::ostream& output) {
 }
 
 std::uint64_t seed_from_password(const std::string_view password) {
+    // `none` 之外的轻量示例加密实现使用稳定 seed，保证同一口令可逆。
     std::uint64_t seed = 14695981039346656037ULL;
     for (const auto ch : password) {
         seed ^= static_cast<unsigned char>(ch);

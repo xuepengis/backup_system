@@ -18,6 +18,7 @@ std::string HuffmanCompressionCodec::name() const {
 
 void HuffmanCompressionCodec::compress(std::istream& input,
                                        std::ostream& output) const {
+    // 复用底层工具类实现，当前编解码器仅负责流与字节数组之间的桥接。
     std::vector<std::uint8_t> data;
     std::array<char, 64 * 1024> buffer {};
 

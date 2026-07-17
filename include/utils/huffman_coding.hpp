@@ -7,6 +7,7 @@
 
 namespace backup_system::utils {
 
+/// Huffman 编码工具类，提供内存数据的编解码能力。
 class HuffmanCoding {
 public:
     /// Encode raw data using Huffman coding.

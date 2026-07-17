@@ -4,6 +4,7 @@
 
 namespace backup_system::strategy {
 
+/// 基于 ChaCha20-Poly1305 的对称加密实现。
 class ChaCha20Poly1305EncryptionCodec final : public IEncryptionCodec {
 public:
     std::string name() const override;

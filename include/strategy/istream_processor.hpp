@@ -9,11 +9,13 @@
 
 namespace backup_system::strategy {
 
+/// 归档载荷所使用的编解码组合描述。
 struct PayloadCodecDescriptor {
     std::string compression_name;
     std::string encryption_name;
 };
 
+/// 压缩算法统一接口。
 class ICompressionCodec {
 public:
     virtual ~ICompressionCodec() = default;
@@ -23,6 +25,7 @@ public:
     virtual void decompress(std::istream& input, std::ostream& output) const = 0;
 };
 
+/// 加密算法统一接口。
 class IEncryptionCodec {
 public:
     virtual ~IEncryptionCodec() = default;
@@ -33,6 +36,7 @@ public:
     virtual void decrypt(std::istream& input, std::ostream& output, std::string_view password) const = 0;
 };
 
+/// 备份/恢复阶段的流处理编排接口。
 class IStreamProcessor {
 public:
     virtual ~IStreamProcessor() = default;
@@ -48,6 +52,7 @@ public:
                          const std::filesystem::path& archived_path) const = 0;
 };
 
+/// 顺序串联压缩与加密能力的默认处理器。
 class PipelineStreamProcessor final : public IStreamProcessor {
 public:
     PipelineStreamProcessor(std::shared_ptr<ICompressionCodec> compression_codec,

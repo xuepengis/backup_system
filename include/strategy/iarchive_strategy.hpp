@@ -13,12 +13,14 @@
 
 namespace backup_system::strategy {
 
+/// 归档中记录项的类型标识。
 enum class ArchiveEntryType : std::uint8_t {
     directory = 1,
     regular_file = 2,
     end_of_archive = 255,
 };
 
+/// 单个归档记录的解析结果。
 struct ArchiveEntry {
     ArchiveEntryType type {ArchiveEntryType::directory};
     std::filesystem::path relative_path;
@@ -29,6 +31,7 @@ struct ArchiveEntry {
     utils::FileMetadata metadata {};
 };
 
+/// 归档写入接口，负责按照既定格式输出目录和文件记录。
 class IArchiveWriter {
 public:
     virtual ~IArchiveWriter() = default;
@@ -43,6 +46,7 @@ public:
     virtual void finish() = 0;
 };
 
+/// 归档读取接口，负责顺序解析归档记录和文件载荷。
 class IArchiveReader {
 public:
     virtual ~IArchiveReader() = default;
@@ -61,6 +65,7 @@ public:
     virtual void finish() = 0;
 };
 
+/// 归档格式策略接口，用于屏蔽不同归档格式实现差异。
 class IArchiveStrategy {
 public:
     virtual ~IArchiveStrategy() = default;
@@ -70,6 +75,7 @@ public:
     virtual std::string name() const = 0;
 };
 
+/// 二进制归档格式实现，负责落盘当前项目的标准归档结构。
 class BinaryArchiveStrategy final : public IArchiveStrategy {
 public:
     BinaryArchiveStrategy(PayloadCodecDescriptor descriptor,

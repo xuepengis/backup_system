@@ -21,6 +21,7 @@ CompositeFileFilter::CompositeFileFilter(std::vector<std::shared_ptr<IFileFilter
 
 bool CompositeFileFilter::should_include(const std::filesystem::directory_entry& entry,
                                          const std::filesystem::path& source_root) const {
+    // 目录始终放行，便于递归遍历继续深入；规则仅作用于普通文件。
     if (entry.is_directory()) {
         return true;
     }

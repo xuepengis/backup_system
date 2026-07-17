@@ -13,6 +13,7 @@ namespace backup_system::strategy {
 
 namespace {
 
+// 默认的原样拷贝实现，供 `none` 编解码组合直接复用。
 void copy_stream(std::istream& input, std::ostream& output) {
     std::array<char, 64 * 1024> buffer {};
 
@@ -98,6 +99,7 @@ void PipelineStreamProcessor::backup(std::istream& input,
                                      const std::filesystem::path& source_path) const {
     (void)source_path;
 
+    // 优先走可直接串流的路径，仅在“压缩 + 加密”组合下使用临时文件衔接。
     if (compression_codec_->name() == "none" && encryption_codec_->name() == "none") {
         copy_stream(input, output);
         return;
@@ -131,6 +133,7 @@ void PipelineStreamProcessor::restore(std::istream& input,
                                       const std::filesystem::path& archived_path) const {
     (void)archived_path;
 
+    // 恢复流程与备份流程相反：先解密，再解压。
     if (compression_codec_->name() == "none" && encryption_codec_->name() == "none") {
         copy_stream(input, output);
         return;

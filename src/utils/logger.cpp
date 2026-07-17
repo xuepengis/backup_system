@@ -6,6 +6,7 @@ namespace backup_system::utils {
 
 namespace {
 
+// 将内部枚举映射为稳定的日志前缀，便于终端与日志采集统一识别。
 std::string_view to_string(const LogLevel level) {
     switch (level) {
     case LogLevel::info:

@@ -16,8 +16,10 @@ namespace backup_system::strategy {
 
 namespace {
 
+// 过滤规则注册表负责将 CLI 规则描述映射为可执行规则对象。
 using FilterRuleFactory = std::function<std::shared_ptr<IFileFilterRule>(const FileFilterRuleSpec&)>;
 
+// 支持 `*` 和 `?` 的轻量通配符匹配，满足路径和文件名筛选需求。
 bool wildcard_match(std::string_view pattern, std::string_view value) {
     std::size_t pattern_index = 0;
     std::size_t value_index = 0;
@@ -61,6 +63,7 @@ bool matches_any_pattern(const std::vector<std::string>& patterns, const std::st
 }
 
 std::chrono::system_clock::time_point to_system_time(const std::filesystem::file_time_type file_time) {
+    // 将文件系统时钟统一转换到 system_clock，便于与 CLI 解析结果比较。
     return std::chrono::time_point_cast<std::chrono::system_clock::duration>(
         file_time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
 }

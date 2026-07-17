@@ -14,6 +14,7 @@ namespace backup_system::core {
 
 namespace {
 
+// 统一格式化路径，避免日志中出现平台相关差异。
 std::string describe_path(const std::filesystem::path& path) {
     return path.string();
 }
@@ -106,10 +107,12 @@ void BackupEngine::backup(const BackupOptions& options) const {
     utils::Logger::info("starting backup from " + describe_path(options.source_root));
     archive_writer->write_directory(".", utils::MetadataUtils::collect(options.source_root));
 
+    // 根目录元数据单独写入，后续遍历仅处理其下级条目。
     for (std::filesystem::recursive_directory_iterator it(options.source_root), end; it != end; ++it) {
         const auto& entry = *it;
 
         if (!filter_->should_include(entry, options.source_root)) {
+            // 被排除的目录需要阻断递归，避免对子项做无意义扫描。
             if (entry.is_directory()) {
                 it.disable_recursion_pending();
             }
@@ -131,6 +134,7 @@ void BackupEngine::restore(const RestoreOptions& options) const {
     utils::Logger::info("starting restore into " + describe_path(options.restore_root));
     std::vector<DeferredMetadataEntry> deferred_directory_metadata;
 
+    // 按归档顺序恢复条目，目录元数据延后回写以保留最终时间戳和权限。
     while (true) {
         const auto entry = archive_reader->read_next_entry();
         if (entry.type == strategy::ArchiveEntryType::end_of_archive) {
@@ -201,6 +205,7 @@ void BackupEngine::backup_regular_file(const std::filesystem::path& source_path,
         throw std::runtime_error("failed to open source file: " + source_path.string());
     }
 
+    // 先计算原始文件的大小和校验值，再将处理后的载荷写入归档。
     const auto original_size = static_cast<std::uint64_t>(std::filesystem::file_size(source_path));
     const auto content_checksum = checksum_engine_->compute_file(source_path);
     auto& archive_output = archive_writer.begin_file(
@@ -243,6 +248,7 @@ void BackupEngine::restore_regular_file(const strategy::ArchiveEntry& entry,
         throw std::runtime_error("failed to flush restore file: " + target_path.string());
     }
 
+    // 先完成内容恢复，再根据归档元数据做完整性校验与属性回写。
     const auto restored_size = static_cast<std::uint64_t>(std::filesystem::file_size(target_path));
     if (restored_size != entry.original_size) {
         throw std::runtime_error("restored file size does not match archive metadata for: " + target_path.string());
@@ -338,6 +344,7 @@ bool BackupEngine::verify_regular_file(const strategy::ArchiveEntry& entry,
 
 void BackupEngine::apply_deferred_directory_metadata(
     const std::vector<DeferredMetadataEntry>& deferred_metadata) const {
+    // 逆序回写目录元数据，确保子目录创建行为不会覆盖父目录的最终属性。
     for (auto it = deferred_metadata.rbegin(); it != deferred_metadata.rend(); ++it) {
         utils::MetadataUtils::apply(it->target_path, it->metadata);
     }

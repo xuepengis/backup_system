@@ -13,6 +13,7 @@ namespace backup_system::app {
 
 namespace {
 
+// 将注册表返回的可选项列表拼接为帮助文案中的 `a|b|c` 格式。
 std::string join_options(const std::vector<std::string>& values) {
     std::ostringstream builder;
     for (std::size_t index = 0; index < values.size(); ++index) {
@@ -24,6 +25,7 @@ std::string join_options(const std::vector<std::string>& values) {
     return builder.str();
 }
 
+// 在进入核心流程前完成命令行参数的组合校验，避免下游组件重复兜底。
 void validate_options(const CliOptions& options) {
     if (options.mode.empty() || options.source.empty()) {
         throw std::invalid_argument("mode and src arguments are required");
@@ -56,6 +58,7 @@ CliOptions CliParser::parse(int argc, char* argv[]) {
     for (int index = 1; index < argc; ++index) {
         const std::string_view arg {argv[index]};
 
+        // 顺序解析扁平参数列表，统一处理“需要紧随取值”的选项。
         auto require_value = [&](const std::string_view name) -> std::string {
             if (index + 1 >= argc) {
                 throw std::invalid_argument("missing value for argument: " + std::string(name));
@@ -102,6 +105,7 @@ CliOptions CliParser::parse(int argc, char* argv[]) {
 }
 
 std::string CliParser::usage(const std::string_view program_name) {
+    // 帮助信息动态读取当前注册算法，避免文档与实现脱节。
     const auto compression_options = join_options(strategy::list_compression_codecs());
     const auto encryption_options = join_options(strategy::list_encryption_codecs());
     const auto checksum_options = join_options(strategy::list_checksum_engines());

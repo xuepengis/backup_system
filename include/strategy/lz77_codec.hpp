@@ -4,6 +4,7 @@
 
 namespace backup_system::strategy {
 
+/// 基于 LZ77 滑动窗口的无损压缩实现。
 class Lz77CompressionCodec final : public ICompressionCodec {
 public:
     std::string name() const override;

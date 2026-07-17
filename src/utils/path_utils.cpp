@@ -13,6 +13,7 @@ std::filesystem::path PathUtils::normalize_for_storage(const std::filesystem::pa
     if (normalized.is_absolute()) {
         throw std::invalid_argument("storage path must be relative");
     }
+    // 显式拒绝 `..`，避免恢复时写出归档根目录之外。
     for (const auto& component : normalized) {
         if (component == "..") {
             throw std::invalid_argument("storage path must not escape the archive root");

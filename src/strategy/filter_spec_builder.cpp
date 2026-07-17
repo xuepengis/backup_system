@@ -14,6 +14,7 @@ namespace backup_system::strategy {
 
 namespace {
 
+// 统一解析 CLI 文本参数，保证过滤规则在进入注册表前已被标准化。
 std::optional<std::uint64_t> parse_size_bytes(const std::string& value) {
     if (value.empty()) {
         return std::nullopt;
@@ -74,6 +75,7 @@ std::vector<FileFilterRuleSpec> FilterSpecBuilder::build_specs(const FilterCliCo
         throw std::invalid_argument("modified-after must not be later than modified-before");
     }
 
+    // 各维度过滤条件拆分为独立规则，后续由组合过滤器执行 AND 语义。
     std::vector<FileFilterRuleSpec> specs;
     if (!config.include_paths.empty()) {
         FileFilterRuleSpec spec;
